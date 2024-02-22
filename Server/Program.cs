@@ -1,45 +1,68 @@
+global using Microsoft.EntityFrameworkCore;
+using Server.Data;
+using Server.Repository;
+using SharedLibrary.Contracts;
 
-namespace Server
+namespace Server;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllersWithViews();
+        builder.Services.AddRazorPages();
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+
+        // pocetak
+        builder.Services.AddDbContext<DataContext>(options =>
         {
-            var builder = WebApplication.CreateBuilder(args);
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("Konekcioni string nije pronadjen"));
+        });
 
-            // Add services to the container.
+        builder.Services.AddScoped<IProizvod, ProizvodRepository>();
 
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddRazorPages();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-                app.UseWebAssemblyDebugging();
-            }
 
-          
-            app.UseHttpsRedirection();
 
-            app.UseBlazorFrameworkFiles();
-            app.UseStaticFiles();
 
-            app.UseAuthorization();
-            
-            app.MapRazorPages();
-            
-            app.MapControllers();
 
-            app.MapFallbackToFile("index.html");
 
-            app.Run();
+
+        // kraj
+
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseWebAssemblyDebugging();
         }
+
+      
+        app.UseHttpsRedirection();
+
+        app.UseBlazorFrameworkFiles();
+        app.UseStaticFiles();
+
+        app.UseAuthorization();
+        
+        app.MapRazorPages();
+        
+        app.MapControllers();
+
+        app.MapFallbackToFile("index.html");
+
+        app.Run();
     }
 }
