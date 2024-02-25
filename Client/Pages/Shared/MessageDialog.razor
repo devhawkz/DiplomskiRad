@@ -1,0 +1,32 @@
+﻿<dialog id="my-dialog" style="border: 5px solid lightBlue; min-width: 300px">
+    <div class="card">
+        <div class="card-header">Obaveštenje!</div>
+        <div class="card-body">
+            <div class="alert alert-@TipUpozorenja">@Poruka</div>
+        </div>
+        <div class="card-footer">
+            <form method="dialog">
+                <button class="btn btn-@TipUpozorenja float-end">Ok</button>
+            </form>
+        </div>
+    </div>
+</dialog>
+
+
+@code {
+    private string TipUpozorenja { get; set; } = string.Empty;
+    private string Poruka { get; set; } = string.Empty;
+
+    public void SetDialogValues(string tipUpozorenja, string poruka)
+    {
+        TipUpozorenja = tipUpozorenja;
+        Poruka = poruka;
+
+        // obavestava komponentu da se njeno stanje promenilo, to ce izazvati ponovno ucitavanje te komponente kada je to moguce
+        StateHasChanged(); 
+    }
+
+    public async Task PrikaziPoruku() => await js.InvokeVoidAsync("ShowDialog");
+
+// stanje komponente koju mi kreiramo je lokalno stanje, nije globalno, ali imamo globalnu metodu koju mozemo pozvati van komponente koja ce postaviti stanje ove komponente
+}

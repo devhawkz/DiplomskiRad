@@ -6,14 +6,9 @@ using System.Transactions;
 
 namespace Server.Repository;
 
-public class ProizvodRepository : IProizvod
+public class ProizvodRepository(DataContext context) : IProizvod
 {
-    private readonly DataContext _context;
-
-    public ProizvodRepository(DataContext context)
-    {
-        this._context = context;
-    }
+   
 
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
@@ -25,7 +20,7 @@ public class ProizvodRepository : IProizvod
         // ako je true
         if(flag)
         {
-            _context.Proizvodi.Add(proizvod);
+            context.Proizvodi.Add(proizvod);
             await Sacuvaj();
             return new ServiceResponse(true, "Proizvod je sačuvan");
         }
@@ -38,20 +33,20 @@ public class ProizvodRepository : IProizvod
     {
         // _ je placeholder, nema potrebe za eksplicitnim imenovanjem promenljive ili parametra
         if(preporuceniProizvod)
-            return await _context.Proizvodi.Where(_=> _.PreporucenProizvod).ToListAsync();
+            return await context.Proizvodi.Where(_=> _.PreporucenProizvod).ToListAsync();
         else
-            return await _context.Proizvodi.ToListAsync();
+            return await context.Proizvodi.ToListAsync();
     }
 
 
     //Proverava da li postoji proizvod sa tim imenom u bazi, ovde znak uzvicnika je null-forgiving operator, naglasavamo kompajleru da na navedenom mestu da tu ne ocekujemo null vrednost, i ako je tip koji koristimo nullable.
     private async Task<ServiceResponse> ProveriImeUBazi(string ime)
     {
-        var proizvod = await _context.Proizvodi.FirstOrDefaultAsync(p => p.Naziv.ToLower()!.Equals(ime.ToLower()));
+        var proizvod = await context.Proizvodi.FirstOrDefaultAsync(p => p.Naziv.ToLower()!.Equals(ime.ToLower()));
         return proizvod is null ? new ServiceResponse(true, null) : new ServiceResponse(false, "Proizvod već postoji");
 
     }
 
     // dobra praksa
-    private async Task Sacuvaj() => await _context.SaveChangesAsync();
+    private async Task Sacuvaj() => await context.SaveChangesAsync();
 }

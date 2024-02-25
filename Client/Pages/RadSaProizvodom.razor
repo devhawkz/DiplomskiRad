@@ -1,0 +1,150 @@
+﻿@page "/dodaj-proizvod"
+@using Client.Pages.Shared;
+@inject IProizvod model;
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 w-100">
+          <EditForm Model="proizvod" Enhance OnValidSubmit="UpravljajProizvodom" >
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                
+                <div class="card">
+                    <div class="card-header">Dodaj proizvod</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Naziv</label>
+                            <InputText @bind-Value="proizvod.Naziv" class="form-control"></InputText>
+                        </div>
+
+                         <div class="form-group mt-3">
+                             <label class="form-label">Cena</label>
+                             <InputNumber @bind-Value="proizvod.Cena" class="form-control"></InputNumber>
+                         </div>
+
+                         <div class="form-group mt-3">
+                             <label class="form-label">Količina</label>
+                             <InputNumber @bind-Value="proizvod.Kolicina" class="form-control"></InputNumber>
+                         </div>
+
+                         <div class="form-group mt-3">
+                             <label class="form-label">Opis</label>
+                             <InputTextArea @bind-Value="proizvod.Opis" class="form-control"></InputTextArea>
+                         </div>
+
+                         <!--Ako promenljiva UploadSlikePoruka ne sadrzi vrednost onda nemoj da koristis nijednu css klasu,
+                             ako sadrzi onda koristi text-danger.
+                             Ako promenljiva UploadSlikePoruka ne sadrzi vrednost onda ispisi Dodaj sliku u labeli, ako sadrzi onda ispisi njenu vrednost
+                         -->
+
+                         <div class="form-group mt-3">
+                             <label class="form-label @(uploadSlikePoruka == "" ? "" : "text-danger")">
+                                    @(uploadSlikePoruka == "" ? "Dodaj sliku" : uploadSlikePoruka)
+                            </label>
+                             <InputFile class="form-control" OnChange="UploadSliku"></InputFile>
+                         </div>
+
+                    </div>
+                    <div class="footer">
+                        <div class="form-group mt-3">
+                            @if(PrikaziDugmeSacuvaj)
+                            {
+                                <button type="submit" class="btn btn-outline-primary">Sačuvaj  <i class="fa fa-plus"></i></button>
+                            }
+                            <BusyDugmeKomponenta PrikaziBusyDugme="PrikaziBusyDugme"></BusyDugmeKomponenta>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+<!--Ukljucuje MessageDialog komponentu u render ove komponente i dodeljuje promenljivoj messageDialog referencu ka komponenti MessageDialog-->
+<MessageDialog @ref="messageDialog"></MessageDialog> 
+
+@code {
+    Proizvod proizvod = new();
+
+    string uploadSlikePoruka = string.Empty;
+
+    //def se promenljiva messageDialog koja je tipa MessageDialog i pomocu nje se pristupa komponenti MessageDialog
+    MessageDialog? messageDialog;
+    public bool PrikaziBusyDugme {get; set;}
+    public bool PrikaziDugmeSacuvaj { get; set; } = true;
+
+    async Task UpravljajProizvodom()
+    {
+        // kada se klikne na dugme sacuvaj onemogucava se ponovni klik na to
+        PrikaziDugmeSacuvaj = false;
+        PrikaziBusyDugme = !PrikaziDugmeSacuvaj;
+
+        //ako nije izabrana slika
+        if(string.IsNullOrEmpty(proizvod.Base64Img))
+        {
+            //Ova metoda  postavlja vrijednosti za dijalog poruke.postavlja se tip poruke na "warning" (upozorenje) i tekst poruke na "Morate da dodate sliku!".
+            messageDialog!.SetDialogValues("warning", "Morate da dodate sliku!");
+
+            // prikazuje se poruka i menja se stanje komponente
+            SetMessageDialog();
+            return;
+        }
+
+        var (flag, poruka) = await model.DodajProizvod(proizvod);
+
+        if (flag)
+            messageDialog!.SetDialogValues("success",poruka);
+            
+        else
+            messageDialog!.SetDialogValues("danger", poruka);
+
+        SetMessageDialog();
+    }
+
+    //ova metoda asinhrono učitava sliku iz foldera, pretvara je u Base64 format i postavlja taj rezultat u odgovarajuće svojstvo objekta, uz dodatnu provjeru da li je slika u ispravnom formatu
+    //InputFileChangeEventArgs vjerojatno predstavlja argument koji se proslijeđuje kada se dogodi promjena u input elementu datoteke.Ovaj argument sadrži informacije o toj promjeni, posebno o datoteci koja je odabrana ili promijenjena. Omogucava nam pristup fajlu
+    async Task UploadSliku(InputFileChangeEventArgs e)
+    {
+        //proverava da li se u nazivu fajla nalazi .png ekstenzija (string)
+        if (e.File.Name.ToLower().Contains(".png"))
+        {
+            // postavlja format slike na png
+            var format = "image/png";
+
+            //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u PNG formatu, a dimenzije su ograničene na 300x300 piksela.
+            var resizeSliku = await e.File.RequestImageFileAsync(format, 300, 300);
+
+            //Stvara se bafer (buffer) veličine potrebne za sliku koja se učitala. Veličina bafera odgovara veličini slike koja je prethodno zatražena.
+            var buffer = new byte[resizeSliku.Size];
+
+            //Asinhrono se čita sadržaj slike i sprema se u bafer. OpenReadStream() otvara tok podataka slike, a ReadAsync(buffer) čita sadržaj slike asinhrono i sprema ga u bafer.
+            await resizeSliku.OpenReadStream().ReadAsync(buffer);
+
+            //Kreira se string podaciSlike koji sadrži podatke slike u Base64 formatu. Ovo je uobičajeni način za kodiranje slika u tekstualni format koji se može lako prenositi preko mreže ili pohraniti u bazu podataka.
+            var podaciSlike = $"podaci:{format};base64,{Convert.ToBase64String(buffer)}";
+
+            //Ako je sve prošlo kako treba, poruka o uploadu slike se postavlja na prazan string, vjerojatno da bi se očistila prethodna poruka ili obavijest.
+            uploadSlikePoruka = string.Empty;
+
+            //Postavlja se Base64 reprezentacija slike u Base64Img svojstvo objekta proizvod
+            proizvod.Base64Img = podaciSlike;
+
+            // brise se podaciSlike promenljiva radi ciscenja memorije
+            podaciSlike = string.Empty;
+            return;
+        }
+
+        uploadSlikePoruka = "Samo slika u png formatu.";
+        return;
+    }
+
+    private async void SetMessageDialog()
+    {
+        await messageDialog!.PrikaziPoruku();
+        PrikaziBusyDugme = false;
+        PrikaziDugmeSacuvaj = !PrikaziBusyDugme;
+
+        // obavestava komponentu da se njeno stanje promenilo, to ce izazvati ponovno ucitavanje te komponente kada je to moguce
+        StateHasChanged();
+    }
+}

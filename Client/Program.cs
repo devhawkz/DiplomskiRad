@@ -1,5 +1,9 @@
+global using SharedLibrary.Contracts;
+global using SharedLibrary.Models;
+global using SharedLibrary.Responses;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Client.Services;
 
 namespace Client
 {
@@ -12,6 +16,8 @@ namespace Client
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+            builder.Services.AddScoped<IProizvod, ClientServices>();
 
             await builder.Build().RunAsync();
         }
