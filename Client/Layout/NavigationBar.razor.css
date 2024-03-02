@@ -1,0 +1,9 @@
+﻿@font-face {
+    font-family: 'MojFont';
+    src: url('Fonts/vermin.ttf') format('truetype');
+}
+
+#topBar{
+    font-family: MojFont;
+    text-align:center;
+}

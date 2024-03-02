@@ -1,0 +1,117 @@
+﻿<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <hr />
+            <span style="font-family:MojFont">Najprodavanije</span>
+            <div class="card border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-evenly align-items-center">
+                        
+                        <img src="../resursi/unazad.png" width="30" height="30" id="styleCursor" @onclick="PrethodnoDugme" />
+                        @if (preporucenaListaProizvoda is null) return;
+                        @foreach (var proizvod in preporucenaListaProizvoda)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    @if (proizvod.DatumPostavljanja.AddDays(30) > DateTime.Now)
+                                    {
+                                        <span class="badge bg-primary d-flex  align-items-end float-end" style="width:50px">Novo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-none d-flex  align-items-end float-end" style="width:50px; height:20px;"></span>
+                                    }
+                                    <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
+                                    <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@proizvod.Naziv</div>
+                                </div>
+                            </div>
+                        }
+                        <img src="../resursi/unapred.png" width="30" height="30" id="styleCursor" @onclick="NarednoDugme" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+    List<Proizvod> listaProizvoda = new();
+    List<Proizvod> preporucenaListaProizvoda = new();
+
+
+    // predstavlja maks br. elemenata na jednoj strani -- po default-u je 8 
+    public int VelicinaStrane { get; set; } = 6;
+
+    //predstavlja br. elemeanta koji treba da se preskoce prilikom prikazivanja -- po default-u 0 za prvu stranu
+    public int Skip { get; set; } = 0;
+
+    //predstavlja br. elemenata koji se uzimaju za prikazivanje -- po default-u 8, ako ima dovoljno proizvoda, ako nema onda ce se prikazati preostali proizvodi 
+    public int Take { get; set; } = 6;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetProizvode();
+    }
+
+    private async Task GetProizvode()
+    {
+        // obrisace se sadrzaj liste samo ako nije null
+        preporucenaListaProizvoda?.Clear();
+        bool preporuceno = true;
+        var rezultat = await clientService.GetProizvode(preporuceno);
+        if (rezultat is null)
+            return;
+
+        var proizvodi = rezultat.ToList();
+        foreach(var proizvod in proizvodi)
+        {
+            listaProizvoda!.Add(proizvod);
+        }
+        UcitajPodatke();
+    }
+
+    void UcitajPodatke()
+    {
+        // lista proizvoda za jednu stranu
+        var podaci = listaProizvoda.Skip(Skip).Take(Take).ToList();
+        Skip += VelicinaStrane;
+        preporucenaListaProizvoda?.Clear();
+        foreach(var proizvod in podaci)
+        {
+            preporucenaListaProizvoda.Add(proizvod);
+        }
+    }
+
+    void PrethodnoDugme()
+    {
+        // ako je  skip == 8 to znaci da se nalazimo na prvoj strani i ne mozemo da idemo unazad
+        if (Skip == 8) return;
+        // proizvodi koji treba da se prikazu na prethodnoj stranici -- f-la za izracunavanje koliko proizvoda treba preskociti 
+
+        var getSledeceProizvode = listaProizvoda!.Skip(Skip - (VelicinaStrane * 2)).Take(Take).ToList();
+        preporucenaListaProizvoda?.Clear();
+        // smanjuje se skip za jednu stranu
+        Skip -= VelicinaStrane;
+        foreach(var proizvod in getSledeceProizvode)
+        {
+            preporucenaListaProizvoda!.Add(proizvod);
+        }
+    }
+
+    void NarednoDugme()
+    {
+        // ako je relacija tacna znaci da se nalazimo na poslednjoj strani
+        if (Skip > listaProizvoda!.Count()) return;
+        var getSledeceProizvode = listaProizvoda!.Skip(Skip).Take(Take).ToList();
+        preporucenaListaProizvoda?.Clear();
+        // povecava se skip za jednu stranu
+        Skip += VelicinaStrane;
+        foreach (var proizvod in getSledeceProizvode)
+        {
+            preporucenaListaProizvoda!.Add(proizvod);
+        }
+
+    }
+
+}

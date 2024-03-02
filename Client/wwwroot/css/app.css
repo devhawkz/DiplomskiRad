@@ -101,3 +101,104 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+/*Custom Styles*/
+#styleCursor {
+    cursor:pointer;
+}
+
+#styleButton {
+    border-radius: 0px;
+}
+
+.control-container {
+    background-color: #ffffff;
+    margin: 0 auto;
+}
+
+.e-carousel .slide-content {
+    align-items: center;
+    display: flex;
+    font-size: 1.25rem;
+    height: 100%;
+    justify-content: center;
+}
+
+.e-carousel .e-carousel-indicators .e-indicator-bars .e-indicator-bar .indicator {
+    background-color: #3e3c41;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    height: 0.5rem;
+    justify-content: center;
+    margin: 0.2rem;
+    width: 2rem;
+}
+
+.e-carousel .e-carousel-indicators .e-indicator-bars .e-indicator-bar.e-active .indicator {
+    background-color: #3C78EF;
+    color: #fff;
+}
+
+
+/*Custom style stop screen loader*/
+/*Screen loader*/
+.spinner {
+    margin: 100px auto;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    font-size: 10px;
+}
+
+    .spinner > div {
+        background-color: #333;
+        height: 100%;
+        width: 6px;
+        display: inline-block;
+        -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+        animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    }
+
+    .spinner .rect2 {
+        -webkit-animation-delay: -1.1s;
+        animation-delay: -1.1s;
+    }
+
+    .spinner .rect3 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+    }
+
+    .spinner .rect4 {
+        -webkit-animation-delay: -0.9s;
+        animation-delay: -0.9s;
+    }
+
+    .spinner .rect5 {
+        -webkit-animation-delay: -0.8s;
+        animation-delay: -0.8s;
+    }
+
+@-webkit-keyframes sk-stretchdelay {
+    0%, 40%, 100% {
+        -webkit-transform: scaleY(0.4);
+    }
+
+    20% {
+        -webkit-transform: scaleY(1.0);
+    }
+}
+
+@keyframes sk-stretchdelay {
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }
+
+    20% {
+        transform: scaleY(1.0);
+        -webkit-transform: scaleY(1.0);
+    }
+}
+

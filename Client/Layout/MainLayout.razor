@@ -1,16 +1,12 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
+<div class="page">
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+        <NavigationBar></NavigationBar>
 
         <article class="content px-4">
-            @Body
+            <!--Ovo je Blazor-ov izraz koji se koristi za prikazivanje dinamičkog sadržaja koji je unapred definisan ili generisan unutar komponente. Ovaj izraz je zamena za mesto gde će se ubaciti sadržaj unutar elementa-->
+            @Body 
         </article>
     </main>
 </div>

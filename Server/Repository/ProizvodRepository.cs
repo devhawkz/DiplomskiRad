@@ -33,7 +33,7 @@ public class ProizvodRepository(DataContext context) : IProizvod
     {
         // _ je placeholder, nema potrebe za eksplicitnim imenovanjem promenljive ili parametra
         if(preporuceniProizvod)
-            return await context.Proizvodi.Where(_=> _.PreporucenProizvod).ToListAsync();
+            return await context.Proizvodi.Where(p=> p.PreporucenProizvod).ToListAsync();
         else
             return await context.Proizvodi.ToListAsync();
     }

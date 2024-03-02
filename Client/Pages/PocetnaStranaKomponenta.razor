@@ -1,0 +1,142 @@
+﻿
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!--Ako postoji neki preporuceni proizvod-->
+            @if (preporucenaListaProizvoda.Any()) 
+            {
+                <div class="control-container text-dark">
+                    <SfCarousel ButtonVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="true">
+                        <ChildContent>
+                            <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 5 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
+                            @foreach (Proizvod proizvod in preporucenaListaProizvoda!.OrderByDescending(_ => _.DatumPostavljanja).Take(5)!)
+                            {
+                                <!--Predstavlja jedan proizvod u slideshow-u-->
+                                <CarouselItem>
+
+                                    <!--Deo za sliku-->
+                                    <figure class="img-container">
+                                        <img src="@proizvod.Base64Img" width="250" height="380" class="float-end" style="cursor:pointer" />
+                                    </figure>
+
+                                    <!--Deo za naziv, opis, kolicinu-->
+                                    <div class="d-flex justify-content-center">
+                                        <div style="position:absolute; bottom:50px;">
+                                            <div class="vstack gap-3 mb-3">
+                                                <div>
+                                                    <p>
+                                                        <span style="font-family:impact; text-indent:2px; cursor:pointer" class="text-dark fw-bold display-2">
+                                                            @proizvod.Naziv
+                                                            <sup style="font-family:'Courier New'">
+                                                                
+                                                                <!--Ako datum postavljanja proizvoda nije stariji od 30 dana stajace novo-->
+                                                                <span class="badge rounded-pill bg-primary fs-6">
+                                                                    @(GetNovuLabelu(proizvod.DatumPostavljanja))
+                                                                </span>
+                                                                
+                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-family:sans serif; font-size:11px;">
+                                                                    
+                                                                    <!--Ako na lageru imamo samo jedan takav proizvod prikazi jedan, ako imamo vise prikazi kolicina - 1 + (npr ako imamo 2 prikazi 1+)--->
+                                                                    @((proizvod.Kolicina - 1) > 0 ? $"{proizvod.Kolicina - 1}+" : proizvod.Kolicina)
+                                                                    <span class="visually-hidden">nepročitane poruke</span>
+                                                                </span>
+                                                            </sup>
+                                                        </span>
+                                                    </p>
+                                                </div>
+
+                                                <p class="text-muted fs-5 w-75" style="text-align:justify-all; font-family:Cambria">
+                                                    
+                                                    <!--Ne prikazujemo ceo Opis vec neki manji deo, do 100 karaktera max-->
+                                                    @(GetOpis(proizvod.Opis))
+                                                </p>
+                                            </div>
+
+                                            <!--Deo za dugmice-->
+                                            <div class="hstack gap-1 d-flex justify-content-center">
+                                                <button class="btn btn-secondary fw-bold" id="styleButton">
+                                                    <i class="fa fa-list"></i> Detalji
+                                                </button>
+                                                
+                                                <button class="btn btn-outline-danger fw-bold" id="styleButton">
+                                                    <i class="fa fa-cart-plus "></i> KUPI ODMAH
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CarouselItem>
+                            }
+                        </ChildContent>
+                        
+                        <!--Strelica unazad -->
+                        <PreviousButtonTemplate>
+                            <img src="../resursi/unazad.png" width="40" height="40" id="styleCursor" />
+                        </PreviousButtonTemplate>
+
+                        <!--Strelica unapred -->
+                        <NextButtonTemplate>
+                            <img src="../resursi/unapred.png" width="40" height="40" id="styleCursor"  />
+                        </NextButtonTemplate>
+
+                        <!--3 tacke -->
+                        <IndicatorsTemplate>
+                            <div class="indicator"> </div>
+                        </IndicatorsTemplate>
+                    </SfCarousel>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">Nijedan proizvod nije dostupan. </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    List<Proizvod>? preporucenaListaProizvoda = new();
+
+    // pokrece metodu DobijanjePreporucenihProizvodaSaServera() pri inicijalizaciji ove komponente
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPreporuceneProizvode();
+    }
+
+    private async Task GetPreporuceneProizvode()
+    {
+        // ? predstavlja null conditional operator, metoda clear ce biti pozvana samo ako listaProizvoda nije null
+        preporucenaListaProizvoda?.Clear();
+
+        bool preporuceniProizvod = true;
+        var rezultat = await clientService.GetProizvode(preporuceniProizvod);
+
+        if (rezultat is null)
+            return;
+
+        foreach(var proizvod in rezultat)
+        {
+            // ! oznacava da se ne ocekuje null vrednost i da se izbegava obavestenje kompajlera o potencijalnoj null referenci
+            preporucenaListaProizvoda!.Add(proizvod);
+        }
+    }
+
+
+    //Ova metoda, na temelju broja dana koji su prošli od postavljanja proizvoda(brojDanaNakonPostavljanja) i maksimalnog dozvoljenog broja dana(maxDana), određuje je li proizvod još uvek "nov" ili ne.
+    string GetNovuLabelu(DateTime datumPostavljanja)
+    {
+        int maxDana = 30;
+        int brojDanaNakonPostavljanja = (DateTime.Now - datumPostavljanja).Days;
+        return brojDanaNakonPostavljanja <= maxDana ? "Novo" : null!;
+    }
+
+    // ako je opis duzi od 100 karaktera, prikazi samo prvih sto karaktera, a ostatak sakri sa 3 tacke
+    string GetOpis(string opis)
+    {
+        string dodajTacke = "...";
+        int maxDuzina = 100;
+        int duzinaOpisa = opis.Length;
+        return duzinaOpisa > maxDuzina ? $"{opis.Substring(0,100)}{dodajTacke}" :  opis;
+    }
+}

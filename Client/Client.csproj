@@ -9,10 +9,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.2" PrivateAssets="all" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="24.2.8" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="24.2.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Fonts\" />
+    <Folder Include="wwwroot\resursi\" />
   </ItemGroup>
 
 </Project>

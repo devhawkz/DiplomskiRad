@@ -4,7 +4,7 @@ namespace Client.Services;
 
 public class ClientServices(HttpClient http) : IProizvod
 {
-    // postavlja osnovnui rutu za sve metode
+    // postavlja osnovnu rutu za sve metode
     private const string _baseUrl = "api/proizvod";
 
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
@@ -19,7 +19,7 @@ public class ClientServices(HttpClient http) : IProizvod
         // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
         var apiOdgovor = await odgovor.Content.ReadAsStringAsync();
 
-        // vraca deserijalizovani json objekat
+        // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
         return DeserializeJsonString<ServiceResponse>(apiOdgovor);
 
     }
@@ -27,7 +27,7 @@ public class ClientServices(HttpClient http) : IProizvod
     public async Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod)
     {
         //zahtevamo od servera sve proizvode ili ako preporuceno nije null onda samo preporucene proizvode
-        var odgovor = await http.GetAsync($"{_baseUrl}?preporuceno={preporuceniProizvod}");
+        var odgovor = await http.GetAsync($"{_baseUrl}?preporuceniProizvodi={preporuceniProizvod}");
 
         if (!odgovor.IsSuccessStatusCode)
             return null;
