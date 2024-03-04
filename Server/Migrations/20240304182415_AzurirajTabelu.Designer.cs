@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240222182732_Prva")]
-    partial class Prva
+    [Migration("20240304182415_AzurirajTabelu")]
+    partial class AzurirajTabelu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,22 @@ namespace Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("SharedLibrary.Models.Kategorija", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Naziv")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Kategorije");
+                });
 
             modelBuilder.Entity("SharedLibrary.Models.Proizvod", b =>
                 {
@@ -43,6 +59,9 @@ namespace Server.Migrations
                     b.Property<DateTime>("DatumPostavljanja")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("KategorijaId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Kolicina")
                         .HasColumnType("int");
 
@@ -51,6 +70,7 @@ namespace Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Opis")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PreporucenProizvod")
@@ -58,7 +78,25 @@ namespace Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KategorijaId");
+
                     b.ToTable("Proizvodi");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.Proizvod", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Kategorija", "Kategorija")
+                        .WithMany("Proizvodi")
+                        .HasForeignKey("KategorijaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kategorija");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.Kategorija", b =>
+                {
+                    b.Navigation("Proizvodi");
                 });
 #pragma warning restore 612, 618
         }

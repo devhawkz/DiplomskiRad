@@ -10,8 +10,9 @@
 @using Client.Layout;
 @using SharedLibrary.Models;
 @using SharedLibrary.Responses;
-@using SharedLibrary.Contracts;
 @using Syncfusion.Blazor.Navigations;
+@using Client.Services.ProizvodServices;
 
+@inject IProizvodService clientService;
 @inject IJSRuntime js;
-@inject IProizvod clientService;
+

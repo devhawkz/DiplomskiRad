@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SharedLibrary.Contracts;
+﻿using Microsoft.AspNetCore.Mvc;
+using Server.Repository.ProizvodRespositories;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
 

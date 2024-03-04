@@ -1,4 +1,3 @@
-global using SharedLibrary.Contracts;
 global using SharedLibrary.Models;
 global using SharedLibrary.Responses;
 using Microsoft.AspNetCore.Components.Web;

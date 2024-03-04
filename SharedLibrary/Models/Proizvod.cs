@@ -28,4 +28,11 @@ public class Proizvod
 
     public DateTime DatumPostavljanja {  get; set; } = DateTime.Now;
 
+
+    //Relacije: Vise proizvoda moze biti u istoj kategoriji, N:1
+    public Kategorija? Kategorija { get; set; }
+
+    //strani kljuc tabele kategorija
+    public int KategorijaId { get; set; }
+
 }

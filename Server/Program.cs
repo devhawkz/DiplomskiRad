@@ -1,7 +1,8 @@
 global using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Server.Repository.KategorijaResposities;
 using Server.Repository.ProizvodRespositories;
-using SharedLibrary.Contracts;
+using Server.Repository.Tools;
 
 namespace Server;
 
@@ -27,8 +28,8 @@ public class Program
         });
 
         builder.Services.AddScoped<IProizvod, ProizvodRepository>();
-
-
+        builder.Services.AddScoped<ITools, ToolsRespository>();
+        builder.Services.AddScoped<IKategorija, KategorijaRespository>();
 
 
 

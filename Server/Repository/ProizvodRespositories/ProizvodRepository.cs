@@ -1,25 +1,27 @@
 ﻿using Server.Data;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
+using Server.Repository.Tools;
 
 namespace Server.Repository.ProizvodRespositories;
 
-public class ProizvodRepository(DataContext context) : IProizvod
+public class ProizvodRepository(DataContext context, ITools tools) : IProizvod
 {
-
-
+    // sluzi da se odabere koja verzija metode ProveriImeUBazi treba da se izvrsi
+    private readonly string vrsta = "proizvod";
+    
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
         if (proizvod is null) return new ServiceResponse(false, "Nije izabran nijedan proizvod");
 
         // dekonstrukcija n-torke (tuple-a), ! je null - forgiving operator isto kao i dole
-        var (flag, poruka) = await ProveriImeUBazi(proizvod.Naziv!);
+        var (flag, poruka) = await tools.ProveriImeUBazi(vrsta, proizvod.Naziv!);
 
         // ako je true
         if (flag)
         {
             context.Proizvodi.Add(proizvod);
-            await Sacuvaj();
+            await tools.Sacuvaj();
             return new ServiceResponse(true, "Proizvod je sačuvan");
         }
 
@@ -36,15 +38,4 @@ public class ProizvodRepository(DataContext context) : IProizvod
             return await context.Proizvodi.ToListAsync();
     }
 
-
-    //Proverava da li postoji proizvod sa tim imenom u bazi, ovde znak uzvicnika je null-forgiving operator, naglasavamo kompajleru da na navedenom mestu da tu ne ocekujemo null vrednost, i ako je tip koji koristimo nullable.
-    private async Task<ServiceResponse> ProveriImeUBazi(string ime)
-    {
-        var proizvod = await context.Proizvodi.FirstOrDefaultAsync(p => p.Naziv.ToLower()!.Equals(ime.ToLower()));
-        return proizvod is null ? new ServiceResponse(true, null) : new ServiceResponse(false, "Proizvod već postoji");
-
-    }
-
-    // dobra praksa
-    private async Task Sacuvaj() => await context.SaveChangesAsync();
 }
