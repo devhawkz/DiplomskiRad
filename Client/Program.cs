@@ -3,8 +3,8 @@ global using SharedLibrary.Models;
 global using SharedLibrary.Responses;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Client.Services;
 using Syncfusion.Blazor;
+using Client.Services.ProizvodServices;
 
 namespace Client;
 
@@ -20,7 +20,7 @@ public class Program
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-        builder.Services.AddScoped<IProizvod, ClientServices>();
+        builder.Services.AddScoped<IProizvodService, ClientServices>();
 
         builder.Services.AddSyncfusionBlazor();
 

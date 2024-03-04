@@ -1,8 +1,8 @@
-﻿using static Client.Services.Tools;
+﻿using static Client.Services.ProizvodServices.Tools;
 
-namespace Client.Services;
+namespace Client.Services.ProizvodServices;
 
-public class ClientServices(HttpClient http) : IProizvod
+public class ClientServices(HttpClient http) : IProizvodService
 {
     // postavlja osnovnu rutu za sve metode
     private const string _baseUrl = "api/proizvod";
@@ -15,7 +15,7 @@ public class ClientServices(HttpClient http) : IProizvod
         // vraca true ako je status code u opsegu od 200-299
         if (!odgovor.IsSuccessStatusCode)
             return new ServiceResponse(false, "Došlo je do greške. Molimo pokušajte kasnije");
-        
+
         // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
         var apiOdgovor = await odgovor.Content.ReadAsStringAsync();
 
@@ -35,6 +35,6 @@ public class ClientServices(HttpClient http) : IProizvod
         var rezultat = await odgovor.Content.ReadAsStringAsync();
 
         // vraca listu proizvoda, [.. ] umesto .ToList();
-        return [..DeserializeJsonStringList<Proizvod>(rezultat)];
+        return [.. DeserializeJsonStringList<Proizvod>(rezultat)];
     }
 }

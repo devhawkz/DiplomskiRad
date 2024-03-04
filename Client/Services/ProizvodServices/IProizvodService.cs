@@ -1,9 +1,9 @@
 ﻿using SharedLibrary.Models;
 using SharedLibrary.Responses;
 
-namespace SharedLibrary.Contracts;
+namespace Client.Services.ProizvodServices;
 
-public interface IProizvod
+public interface IProizvodService
 {
     Task<ServiceResponse> DodajProizvod(Proizvod proizvod);
     Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod);

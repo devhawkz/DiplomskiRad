@@ -9,8 +9,8 @@
                 <div class="control-container text-dark">
                     <SfCarousel ButtonVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="true">
                         <ChildContent>
-                            <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 5 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
-                            @foreach (Proizvod proizvod in preporucenaListaProizvoda!.OrderByDescending(_ => _.DatumPostavljanja).Take(5)!)
+                            <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 3 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
+                            @foreach (Proizvod proizvod in preporucenaListaProizvoda!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
                             {
                                 <!--Predstavlja jedan proizvod u slideshow-u-->
                                 <CarouselItem>

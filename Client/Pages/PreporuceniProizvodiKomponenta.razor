@@ -40,13 +40,13 @@
 
 
     // predstavlja maks br. elemenata na jednoj strani -- po default-u je 8 
-    public int VelicinaStrane { get; set; } = 6;
+    public int VelicinaStrane { get; set; } = 5;
 
     //predstavlja br. elemeanta koji treba da se preskoce prilikom prikazivanja -- po default-u 0 za prvu stranu
     public int Skip { get; set; } = 0;
 
     //predstavlja br. elemenata koji se uzimaju za prikazivanje -- po default-u 8, ako ima dovoljno proizvoda, ako nema onda ce se prikazati preostali proizvodi 
-    public int Take { get; set; } = 6;
+    public int Take { get; set; } = 5;
 
 
     protected async override Task OnInitializedAsync()

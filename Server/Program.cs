@@ -1,6 +1,6 @@
 global using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Repository;
+using Server.Repository.ProizvodRespositories;
 using SharedLibrary.Contracts;
 
 namespace Server;

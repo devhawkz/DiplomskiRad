@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace Client.Services;
+namespace Client.Services.ProizvodServices;
 
 internal static class Tools
 {

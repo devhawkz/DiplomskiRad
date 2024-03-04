@@ -1,14 +1,12 @@
 ﻿using Server.Data;
-using SharedLibrary.Contracts;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
-using System.Transactions;
 
-namespace Server.Repository;
+namespace Server.Repository.ProizvodRespositories;
 
 public class ProizvodRepository(DataContext context) : IProizvod
 {
-   
+
 
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
@@ -18,7 +16,7 @@ public class ProizvodRepository(DataContext context) : IProizvod
         var (flag, poruka) = await ProveriImeUBazi(proizvod.Naziv!);
 
         // ako je true
-        if(flag)
+        if (flag)
         {
             context.Proizvodi.Add(proizvod);
             await Sacuvaj();
@@ -32,8 +30,8 @@ public class ProizvodRepository(DataContext context) : IProizvod
     public async Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod)
     {
         // _ je placeholder, nema potrebe za eksplicitnim imenovanjem promenljive ili parametra
-        if(preporuceniProizvod)
-            return await context.Proizvodi.Where(p=> p.PreporucenProizvod).ToListAsync();
+        if (preporuceniProizvod)
+            return await context.Proizvodi.Where(p => p.PreporucenProizvod).ToListAsync();
         else
             return await context.Proizvodi.ToListAsync();
     }
