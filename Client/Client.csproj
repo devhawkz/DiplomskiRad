@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\KategorijaPages\" />
     <Folder Include="wwwroot\Fonts\" />
     <Folder Include="wwwroot\resursi\" />
   </ItemGroup>

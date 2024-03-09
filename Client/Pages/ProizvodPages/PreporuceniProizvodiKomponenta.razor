@@ -59,15 +59,8 @@
         // obrisace se sadrzaj liste samo ako nije null
         preporucenaListaProizvoda?.Clear();
         bool preporuceno = true;
-        var rezultat = await clientService.GetProizvode(preporuceno);
-        if (rezultat is null)
-            return;
-
-        var proizvodi = rezultat.ToList();
-        foreach(var proizvod in proizvodi)
-        {
-            listaProizvoda!.Add(proizvod);
-        }
+        await clientService.GetProizvode(preporuceno);
+        var preporuceniProizvodi = clientService.PreporuceniProizvodi;    
         UcitajPodatke();
     }
 

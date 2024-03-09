@@ -5,6 +5,10 @@ namespace Client.Services.ProizvodServices;
 
 public interface IProizvodService
 {
+    // ovaj delegat koristimo kako bi obavestili aplikaciju ili komponentu o promeni, apl. se nece reload-ovati
+    Action? ProizvodAction { get; set; }
     Task<ServiceResponse> DodajProizvod(Proizvod proizvod);
-    Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod);
+    Task GetProizvode(bool preporuceniProizvod);
+    List<Proizvod> SviProizvodi { get; set; }
+    List<Proizvod> PreporuceniProizvodi { get; set; }
 }

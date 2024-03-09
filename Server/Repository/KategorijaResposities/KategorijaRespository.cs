@@ -9,7 +9,7 @@ namespace Server.Repository.KategorijaResposities;
 public class KategorijaRespository(DataContext context, ITools tools) : IKategorija
 {
     // sluzi da se odabere koja vrsta metode ProveriImeUBazi treba da se izvrsi
-    private readonly string vrsta = "kategorija";
+    private const string vrsta = "kategorija";
 
     public async Task<ServiceResponse> DodajKategoriju(Kategorija model)
     {

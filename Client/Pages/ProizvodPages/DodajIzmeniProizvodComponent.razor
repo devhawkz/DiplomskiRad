@@ -112,13 +112,13 @@
     async Task UploadSliku(InputFileChangeEventArgs e)
     {
         //proverava da li se u nazivu fajla nalazi .png ekstenzija (string)
-        if (e.File.Name.ToLower().Contains(".png"))
+        if (e.File.Name.ToLower().Contains(".jpg"))
         {
             // postavlja format slike na png
-            var format = "image/png";
+            var format = "image/jpg";
 
-            //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u png formatu, a dimenzije su ograničene na 300x300 piksela.
-            var resizeSliku = await e.File.RequestImageFileAsync(format, 300, 300);
+            //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u jpg formatu, a dimenzije su ograničene na 500x500 piksela.
+            var resizeSliku = await e.File.RequestImageFileAsync(format, 500, 500);
 
             //Stvara se bafer (buffer) veličine potrebne za sliku koja se učitala. Veličina bafera odgovara veličini slike koja je prethodno zatražena.
             var buffer = new byte[resizeSliku.Size];
@@ -140,7 +140,7 @@
             return;
         }
 
-        uploadSlikePoruka = "Samo slika u png formatu.";
+        uploadSlikePoruka = "Samo slika u jpg formatu.";
         return;
     }
 

@@ -1,40 +1,155 @@
-﻿using static Client.Services.ProizvodServices.Tools;
+﻿using Client.Services.KategorijaServices;
+using Client.Services.ToolsService;
+
 
 namespace Client.Services.ProizvodServices;
 
-public class ClientServices(HttpClient http) : IProizvodService
+public class ClientServices(HttpClient http, IToolsService toolsService) : IProizvodService, IKategorijaService
 {
     // postavlja osnovnu rutu za sve metode
-    private const string _baseUrl = "api/proizvod";
+    private const string _proizvodBaseUrl = "api/proizvod";
+    private const string _kategorijaBaseUrl = "api/kategorija";
+
+    /* SVOJSTVA */
+    public Action? KategorijaAction { get; set ; }
+    public List<Kategorija> SveKategorije { get; set; }
+
+    public Action? ProizvodAction { get; set ; }
+    public List<Proizvod> SviProizvodi { get; set; }
+    public List<Proizvod> PreporuceniProizvodi { get; set; }
+
+    /* PROIZVODI */
 
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
         // serijalizujemo C# objekat (proizvod koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
-        var odgovor = await http.PostAsync(_baseUrl, GenerateStringContent(SerializeObj(proizvod)));
+        var odgovor = await http.PostAsync(_proizvodBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(proizvod)));
 
         // vraca true ako je status code u opsegu od 200-299
-        if (!odgovor.IsSuccessStatusCode)
-            return new ServiceResponse(false, "Došlo je do greške. Molimo pokušajte kasnije");
+        var rezultat = toolsService.ProveriStatusKod(odgovor);
 
         // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
-        var apiOdgovor = await odgovor.Content.ReadAsStringAsync();
+        var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
+
+        // kako bi se dodao novi proizvod u listu proizvoda koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika
+        await AzuriranjeListeProizvoda(proizvod);
 
         // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
-        return DeserializeJsonString<ServiceResponse>(apiOdgovor);
+        return toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
 
     }
 
-    public async Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod)
+    // metoda koja azurira listu proizvoda koja se nalazi u memoriji pregledaca, nakon sto se doda novi proizvod
+    private async Task AzuriranjeListeProizvoda(Proizvod proizvod)
+    {
+        PreporuceniProizvodi = null!;
+        SviProizvodi = null!;
+
+        await GetProizvode(proizvod.PreporucenProizvod);
+        await GetProizvode(!proizvod.PreporucenProizvod);
+    }
+
+    // glavna get metoda
+    public async Task GetProizvode(bool preporuceniProizvod)
+    {
+
+        if (!preporuceniProizvod && SviProizvodi is null)
+        { 
+            SviProizvodi = await GetProizvodeSaApi(preporuceniProizvod);
+            ProizvodAction?.Invoke();
+            return;
+        }
+
+        // bolji nacin umesto 2 if-a
+        else
+        {
+            if (preporuceniProizvod && PreporuceniProizvodi is null)
+            {
+                PreporuceniProizvodi = await GetProizvodeSaApi(preporuceniProizvod);
+                ProizvodAction?.Invoke();
+                return;
+            }
+        }
+              
+    }
+
+    // metoda koja uzima proizvode sa servera
+    private async Task<List<Proizvod>> GetProizvodeSaApi(bool preporuceniProizvod)
     {
         //zahtevamo od servera sve proizvode ili ako preporuceno nije null onda samo preporucene proizvode
-        var odgovor = await http.GetAsync($"{_baseUrl}?preporuceniProizvodi={preporuceniProizvod}");
+        var odgovor = await http.GetAsync($"{_proizvodBaseUrl}?preporuceniProizvodi={preporuceniProizvod}");
 
-        if (!odgovor.IsSuccessStatusCode)
-            return null;
+        // isto radi kao u metodi GetKategorije
+        var (flag, _) = toolsService.ProveriStatusKod(odgovor);
 
-        var rezultat = await odgovor.Content.ReadAsStringAsync();
+        // ako je flag false prekida se izvrsenje metode i ne vraca se nista
+        if (!flag) return null;
 
-        // vraca listu proizvoda, [.. ] umesto .ToList();
-        return [.. DeserializeJsonStringList<Proizvod>(rezultat)];
+        // rezultat promenljiva sadrzi json string
+        var rezultat = await toolsService.CitajSadrzaj(odgovor);
+
+        // ? - null conditional operator, ! - null forgiving operator, ovde se vraca c# objekat koji je tipa List<Proizvod> koji je deserijalizovan iz JsonStringa koji se cuva u promenljivoj rezultat
+        return (List<Proizvod>?)toolsService.DeserializeJsonStringList<Proizvod>(rezultat)!;
+
     }
+
+   
+    /*KATEGORIJE*/
+
+    public async Task<ServiceResponse> DodajKategoriju(Kategorija model)
+    {
+        // serijalizujemo C# objekat (kategoriju koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
+        var odgovor = await http.PostAsync(_kategorijaBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(model)));
+
+        // vraca true ako je status code u opsegu od 200-299
+        var rezultat = toolsService.ProveriStatusKod(odgovor);
+
+        // vraca true granu ProveriStatusKod metode tools klase
+        if (!rezultat.Flag) return rezultat;
+
+        // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
+        var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
+
+        // kako bi se dodao novi proizvod u listu proizvoda koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika
+        await AzuriranjeListeKategorija();
+
+        // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
+        return toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+    }
+
+    // metoda koja azurira listu proizvoda koja se nalazi u memoriji pregledaca, nakon sto se doda novi proizvod
+    private async Task AzuriranjeListeKategorija()
+    {
+        SveKategorije = null!;
+        await GetKategorije();
+    }
+
+    // glavna get metoda
+    public async Task GetKategorije()
+    {
+        if(SveKategorije is null)
+        {
+            SveKategorije =  await GetKategorijeSaApi();
+            KategorijaAction?.Invoke();
+        }
+    }
+
+    // metoda koja uzima kategorije sa servera
+    private async Task<List<Kategorija>> GetKategorijeSaApi()
+    {
+        //zahtevamo od servera sve kategorije ako je lista prazna
+        var odgovor = await http.GetAsync(_kategorijaBaseUrl);
+
+        // isto radi kao u metodi GetProizvodi
+        var provera = toolsService.ProveriStatusKod(odgovor);
+
+        // ako je flag false prekida se izvrsenje metode i ne vraca se nista 
+        if (!provera.Flag) return null!;
+
+        // rezultat promenljiva sadrzi json string
+        var rezultat = await toolsService.CitajSadrzaj(odgovor);
+
+        return (List<Kategorija>?)toolsService.DeserializeJsonStringList<Kategorija>(rezultat)!;
+    }
+
 }

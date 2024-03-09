@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
 using Client.Services.ProizvodServices;
+using Client.Services.ToolsService;
+using Client.Services.KategorijaServices;
 
 namespace Client;
 
@@ -20,6 +22,9 @@ public class Program
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
         builder.Services.AddScoped<IProizvodService, ClientServices>();
+        builder.Services.AddSingleton<IToolsService, Tools>();
+        builder.Services.AddScoped<IKategorijaService, ClientServices>();
+
 
         builder.Services.AddSyncfusionBlazor();
 

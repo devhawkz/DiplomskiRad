@@ -98,7 +98,7 @@
 @code {
     List<Proizvod>? preporucenaListaProizvoda = new();
 
-    // pokrece metodu DobijanjePreporucenihProizvodaSaServera() pri inicijalizaciji ove komponente
+    // pokrece metodu GetPreporuceneProizvode() pri inicijalizaciji ove komponente
     protected override async Task OnInitializedAsync()
     {
         await GetPreporuceneProizvode();
@@ -110,16 +110,8 @@
         preporucenaListaProizvoda?.Clear();
 
         bool preporuceniProizvod = true;
-        var rezultat = await clientService.GetProizvode(preporuceniProizvod);
-
-        if (rezultat is null)
-            return;
-
-        foreach(var proizvod in rezultat)
-        {
-            // ! oznacava da se ne ocekuje null vrednost i da se izbegava obavestenje kompajlera o potencijalnoj null referenci
-            preporucenaListaProizvoda!.Add(proizvod);
-        }
+        await clientService.GetProizvode(preporuceniProizvod);
+        preporucenaListaProizvoda = clientService.PreporuceniProizvodi;
     }
 
 

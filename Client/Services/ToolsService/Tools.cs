@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace Client.Services.ProizvodServices;
+namespace Client.Services.ToolsService;
 
-internal static class Tools
+internal class Tools : IToolsService
 {
 
     //služi za konfiguriranje opcija za serializaciju i deserializaciju JSON podataka pomoću JsonSerializerOptions klase koja dolazi s .NET Core bibliotekom
-    public static JsonSerializerOptions JsonOptions()
+    public JsonSerializerOptions JsonOptions()
     {
         return new JsonSerializerOptions
         {
@@ -26,16 +26,26 @@ internal static class Tools
         };
     }
 
-    // koristi se za generisanje StringContent objekta koji se koristi za HTTP zahtjeve, posebno za slanje JSON podataka na server, objasnjenje koda u svesci
-    public static StringContent GenerateStringContent(string serialiazedObj) => new(serialiazedObj, System.Text.Encoding.UTF8, "application/json");
+    // koristi se za generisanje StringContent objekta koji se koristi za HTTP zahtjeve, posebno za slanje JSON podataka na server, objasnjenje koda u svesci -- konvertuje json objekat u StrinContent objekat(niz znakova)
+    public StringContent GenerateStringContent(string serialiazedObj) => new(serialiazedObj, System.Text.Encoding.UTF8, "application/json");
 
     // ova metoda serijalizuje objekat bilo koje klase u Json objekat na osnovu prethodno definisane standardizacije
-    public static string SerializeObj<T>(T modelObject) => JsonSerializer.Serialize(modelObject, JsonOptions());
+    public string SerializeObj<T>(T modelObject) => JsonSerializer.Serialize(modelObject, JsonOptions());
 
     // genericka metoda, vraca objekat tipa T, ova metoda omogućuje brzu i jednostavnu deserializaciju JSON stringa u objekt određenog tipa, koristeći zadane ili prilagođene opcije deserializacije
-    public static T DeserializeJsonString<T>(string jsonString) => JsonSerializer.Deserialize<T>(jsonString, JsonOptions())!;
+    public T DeserializeJsonString<T>(string jsonString) => JsonSerializer.Deserialize<T>(jsonString, JsonOptions())!;
 
     //  služi za deserializaciju JSON stringa u listu objekata određenog tipa T, ova metoda omogućuje brzu i jednostavnu deserializaciju JSON stringa u listu objekata određenog tipa, koristeći zadane ili prilagođene opcije deserializacije.
-    public static IList<T> DeserializeJsonStringList<T>(string jsonString) => JsonSerializer.Deserialize<IList<T>>(jsonString, JsonOptions())!;
+    public IList<T> DeserializeJsonStringList<T>(string jsonString) => JsonSerializer.Deserialize<IList<T>>(jsonString, JsonOptions())!;
 
+    public ServiceResponse ProveriStatusKod(HttpResponseMessage odgovor)
+    {
+        if (!odgovor.IsSuccessStatusCode)
+            return new ServiceResponse(false, "Došlo je do greške. Molimo pokušajte kasnije");
+        else
+            return new ServiceResponse(true, null);
+    }
+
+    // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
+    public async Task<string> CitajSadrzaj(HttpResponseMessage odgovor) => await odgovor.Content.ReadAsStringAsync();
 }

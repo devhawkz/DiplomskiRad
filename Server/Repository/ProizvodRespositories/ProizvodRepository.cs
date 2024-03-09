@@ -8,7 +8,7 @@ namespace Server.Repository.ProizvodRespositories;
 public class ProizvodRepository(DataContext context, ITools tools) : IProizvod
 {
     // sluzi da se odabere koja verzija metode ProveriImeUBazi treba da se izvrsi
-    private readonly string vrsta = "proizvod";
+    private const string vrsta = "proizvod";
     
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
