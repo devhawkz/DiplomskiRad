@@ -1,0 +1,64 @@
+﻿@page "/kategorije"
+@implements IDisposable;
+
+@if(kategorijaService.SveKategorije is not null)
+{
+    <div class="card sticky-top" style="font-family:Tahoma; max-height:100%; overflow-y:scroll">
+        <div class="card-header">Kategorije proizvoda</div>
+        <div class="card-body">
+            <div class="list-group">
+                <!--Klikom na ovo dugme poziva se event OsnovnaKategorijaKlikEvent-->
+                <button type="button" @onclick="OsnovnaKategorijaKlik" class="list-group-item list-group-item-action @(KategorijaId == 0? "active" : "")">
+                    <i class="fa fa-object-group"></i> Sve kategorije
+                </button>
+                @foreach(var kategorija in kategorijaService.SveKategorije)
+                {
+                    <!--Klikom na ovo dugme poziva se event KategorijaKlikEvent-->
+                    <button type="button" @onclick="() => KategorijaKlik(kategorija.Id)" class="list-group-item list-group-item-action mt-3 fw-bold  @(kategorija.Id == KategorijaId? "active" : "")">
+                        @kategorija.Naziv!.ToUpper()
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // ovo je publisher komponenta -- u kontekstu event-ova
+
+
+    public int KategorijaId { get; set; } = 0;
+
+    // vezano za OsnovnaKategorijaKlik metodu
+    [Parameter]
+    public EventCallback OsnovnaKategorijaKlikEvent { get; set; }
+
+    // to je parametar komponente, koji je dostupan za spoljnu upotrebu, moze biti postavljen izvan ove komponente , vezano za KategorijaKlik metodu, vidi objasnjenje u svesci
+    [Parameter] 
+    public EventCallback<int> KategorijaKlikEvent { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await kategorijaService.GetKategorije();
+        kategorijaService.KategorijaAction += StateHasChanged;
+    }
+
+    //Prikazuje proizvode svih kategorija
+    private async Task OsnovnaKategorijaKlik()
+    {
+        KategorijaId = 0;
+        await OsnovnaKategorijaKlikEvent.InvokeAsync();
+    }
+
+    //Ova metoda omogućava da se kada korisnik klikne na određenu kategoriju, pokrene odgovarajuća logika koja je vezana za tu akciju. Na primer, roditeljska komponenta koja koristi ovu komponentu može pratiti ovaj događaj i preduzeti odgovarajuće akcije, kao što je ažuriranje prikaza u skladu sa odabranom kategorijom. Prikazuje proizvode samo odredjene kategorije
+    private async Task KategorijaKlik(int kategorijaId)
+    {
+        KategorijaId = kategorijaId;
+        await KategorijaKlikEvent.InvokeAsync(kategorijaId);
+    }
+
+    public void Dispose()
+    {
+        kategorijaService.KategorijaAction -= StateHasChanged;
+    }
+}

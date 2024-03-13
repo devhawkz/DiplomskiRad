@@ -1,4 +1,6 @@
-﻿<div class="container-fluid mt-5">
+﻿@implements IDisposable;
+
+<div class="container-fluid mt-5">
     <div class="row">
         <div class="col-md-12 col-sm-12">
             <hr />
@@ -35,76 +37,67 @@
 </div>
 
 @code{
-    List<Proizvod> listaProizvoda = new();
-    List<Proizvod> preporucenaListaProizvoda = new();
+    List<Proizvod>preporucenaListaProizvoda = new();
 
-
-    // predstavlja maks br. elemenata na jednoj strani -- po default-u je 8 
+    // predstavlja maks br. elemenata na jednoj strani -- po default-u je 5 
     public int VelicinaStrane { get; set; } = 5;
 
     //predstavlja br. elemeanta koji treba da se preskoce prilikom prikazivanja -- po default-u 0 za prvu stranu
     public int Skip { get; set; } = 0;
 
-    //predstavlja br. elemenata koji se uzimaju za prikazivanje -- po default-u 8, ako ima dovoljno proizvoda, ako nema onda ce se prikazati preostali proizvodi 
+    //predstavlja br. elemenata koji se uzimaju za prikazivanje -- po default-u 5, ako ima dovoljno proizvoda, ako nema onda ce se prikazati preostali proizvodi 
     public int Take { get; set; } = 5;
 
 
     protected async override Task OnInitializedAsync()
     {
-        await GetProizvode();
-    }
-
-    private async Task GetProizvode()
-    {
-        // obrisace se sadrzaj liste samo ako nije null
-        preporucenaListaProizvoda?.Clear();
+        // nije preporucljivo direktno slanje vrednosti vec se salju promenljive
         bool preporuceno = true;
-        await clientService.GetProizvode(preporuceno);
-        var preporuceniProizvodi = clientService.PreporuceniProizvodi;    
+        await proizvodService.GetProizvode(preporuceno);
+        proizvodService.ProizvodAction += StateHasChanged;
         UcitajPodatke();
     }
 
-    void UcitajPodatke()
+    private async void UcitajPodatke()
     {
         // lista proizvoda za jednu stranu
-        var podaci = listaProizvoda.Skip(Skip).Take(Take).ToList();
+        var listaProizvoda = await SkipAndTake(Skip, Take);
         Skip += VelicinaStrane;
-        preporucenaListaProizvoda?.Clear();
-        foreach(var proizvod in podaci)
-        {
-            preporucenaListaProizvoda.Add(proizvod);
-        }
+        DodajUPreporuceneProizvode(listaProizvoda);
     }
 
-    void PrethodnoDugme()
-    {
-        // ako je  skip == 8 to znaci da se nalazimo na prvoj strani i ne mozemo da idemo unazad
-        if (Skip == 8) return;
-        // proizvodi koji treba da se prikazu na prethodnoj stranici -- f-la za izracunavanje koliko proizvoda treba preskociti 
+    private async Task<List<Proizvod>> SkipAndTake(int skip, int take) => proizvodService.PreporuceniProizvodi.Skip(skip).Take(take).ToList();
 
-        var getSledeceProizvode = listaProizvoda!.Skip(Skip - (VelicinaStrane * 2)).Take(Take).ToList();
+    private void DodajUPreporuceneProizvode(List<Proizvod> listaProizvoda)
+    {
+        // ako ova promenljiva ima null vrednost onda se metoda clear nece izvrsiti
         preporucenaListaProizvoda?.Clear();
+        preporucenaListaProizvoda = listaProizvoda;
+    }
+
+    async void PrethodnoDugme()
+    {
+        // ako je  skip == 5 to znaci da se nalazimo na prvoj strani i ne mozemo da idemo unazad
+        if (Skip == 5) return;
+        // proizvodi koji treba da se prikazu na prethodnoj stranici -- f-la za izracunavanje koliko proizvoda treba preskociti
+        var getPrethodneProizvode = await SkipAndTake(Skip - (VelicinaStrane * 2), Take);
         // smanjuje se skip za jednu stranu
         Skip -= VelicinaStrane;
-        foreach(var proizvod in getSledeceProizvode)
-        {
-            preporucenaListaProizvoda!.Add(proizvod);
-        }
+        DodajUPreporuceneProizvode(getPrethodneProizvode);
     }
 
-    void NarednoDugme()
+    async void NarednoDugme()
     {
         // ako je relacija tacna znaci da se nalazimo na poslednjoj strani
-        if (Skip > listaProizvoda!.Count()) return;
-        var getSledeceProizvode = listaProizvoda!.Skip(Skip).Take(Take).ToList();
-        preporucenaListaProizvoda?.Clear();
+        if (Skip > proizvodService.PreporuceniProizvodi!.Count()) return;
+        var getSledeceProizvode = await SkipAndTake(Skip, Take);
         // povecava se skip za jednu stranu
         Skip += VelicinaStrane;
-        foreach (var proizvod in getSledeceProizvode)
-        {
-            preporucenaListaProizvoda!.Add(proizvod);
-        }
-
+        DodajUPreporuceneProizvode(getSledeceProizvode);
     }
 
+    public void Dispose()
+    {
+        proizvodService.ProizvodAction -= StateHasChanged;
+    }
 }

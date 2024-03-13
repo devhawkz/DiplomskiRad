@@ -6,6 +6,7 @@ using Syncfusion.Blazor;
 using Client.Services.ProizvodServices;
 using Client.Services.ToolsService;
 using Client.Services.KategorijaServices;
+using Client.Services.DialogServices;
 
 namespace Client;
 
@@ -24,6 +25,7 @@ public class Program
         builder.Services.AddScoped<IProizvodService, ClientServices>();
         builder.Services.AddSingleton<IToolsService, Tools>();
         builder.Services.AddScoped<IKategorijaService, ClientServices>();
+        builder.Services.AddScoped<MessageDialogService>();
 
 
         builder.Services.AddSyncfusionBlazor();

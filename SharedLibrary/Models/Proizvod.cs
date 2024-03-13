@@ -30,6 +30,7 @@ public class Proizvod
 
 
     //Relacije: Vise proizvoda moze biti u istoj kategoriji, N:1
+    [Required(ErrorMessage = "Odabir Kategorije je obavezan.")]
     public Kategorija? Kategorija { get; set; }
 
     //strani kljuc tabele kategorija

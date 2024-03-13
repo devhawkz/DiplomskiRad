@@ -17,9 +17,11 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     public Action? ProizvodAction { get; set ; }
     public List<Proizvod> SviProizvodi { get; set; }
     public List<Proizvod> PreporuceniProizvodi { get; set; }
+    public List<Proizvod> ProizvodiIsteKategorije { get; set; }
 
     /* PROIZVODI */
 
+    // Prilikom dodavanja novog proizvoda Post metodom, ako je uspesno dodat onda se poziva Get metoda koja vraca listu svih proizvoda iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
         // serijalizujemo C# objekat (proizvod koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
@@ -31,12 +33,15 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
         var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
 
+        // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
+        var podaci =  toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+
+         // kako bi se dodao novi proizvod u listu proizvoda koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika, poziva se servis sa servera koji salje sve prozivode iz baze, api poziv
+        if (!podaci.Flag) return podaci;
+
         // kako bi se dodao novi proizvod u listu proizvoda koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika
         await AzuriranjeListeProizvoda(proizvod);
-
-        // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
-        return toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
-
+        return podaci;
     }
 
     // metoda koja azurira listu proizvoda koja se nalazi u memoriji pregledaca, nakon sto se doda novi proizvod
@@ -93,9 +98,20 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
 
     }
 
-   
+    // metoda koja vraca sve proizvode iste kategorije
+    public async Task GetProizvodeIsteKategorije(int kategorijaId)
+    {
+        bool preporuceno = false;
+        await GetProizvode(preporuceno);
+
+        // iz liste svih proizvoda koji se nalaze vec u memoriji pregledaca uzimaju se samo oni sa datom kategorijom
+        ProizvodiIsteKategorije = SviProizvodi.Where(_ => _.KategorijaId == kategorijaId).ToList();
+        ProizvodAction?.Invoke();
+    }
+
     /*KATEGORIJE*/
 
+    // Prilikom dodavanja nove kategorije Post metodom, ako je uspesno dodata onda se poziva Get metoda koja vraca listu svih kategorija iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda
     public async Task<ServiceResponse> DodajKategoriju(Kategorija model)
     {
         // serijalizujemo C# objekat (kategoriju koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
@@ -110,11 +126,15 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
         var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
 
-        // kako bi se dodao novi proizvod u listu proizvoda koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika
-        await AzuriranjeListeKategorija();
-
         // vraca deserijalizovani json objekat kao odgovor (vraca service response, true ili false)
-        return toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+        var podaci = toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+
+        // u slucaju da se kategorija koju korisnik zeli da doda vec postoji u bazi
+        if (!podaci.Flag) return podaci;
+
+        // kako bi se dodao nova kategorija u listu kateogrija koja se ne nalazi na serveru zbog boljih perfomansi, vec se nalazi u memoriji pregledaca korisnika, poziva se servis sa servera koji salje sve kategorije iz baze, api poziv
+        await AzuriranjeListeKategorija();
+        return podaci;
     }
 
     // metoda koja azurira listu proizvoda koja se nalazi u memoriji pregledaca, nakon sto se doda novi proizvod
@@ -127,7 +147,8 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     // glavna get metoda
     public async Task GetKategorije()
     {
-        if(SveKategorije is null)
+        //zahtevamo od servera sve kategorije ako je lista prazna
+        if (SveKategorije is null)
         {
             SveKategorije =  await GetKategorijeSaApi();
             KategorijaAction?.Invoke();
@@ -137,7 +158,6 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     // metoda koja uzima kategorije sa servera
     private async Task<List<Kategorija>> GetKategorijeSaApi()
     {
-        //zahtevamo od servera sve kategorije ako je lista prazna
         var odgovor = await http.GetAsync(_kategorijaBaseUrl);
 
         // isto radi kao u metodi GetProizvodi

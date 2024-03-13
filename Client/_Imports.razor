@@ -12,7 +12,14 @@
 @using SharedLibrary.Responses;
 @using Syncfusion.Blazor.Navigations;
 @using Client.Services.ProizvodServices;
+@using Client.Services.KategorijaServices;
+@using Client.Pages.Shared;
+@using Client.Services.DialogServices;
+@using Client.Pages.KategorijaPages;
 
-@inject IProizvodService clientService;
+
+@inject MessageDialogService messageDialogService
+@inject IProizvodService proizvodService;
+@inject IKategorijaService kategorijaService;
 @inject IJSRuntime js;
 

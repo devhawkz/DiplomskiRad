@@ -1,16 +1,16 @@
-﻿
+﻿@implements IDisposable;
 
 <div class="container">
     <div class="row">
         <div class="col-md-12">
             <!--Ako postoji neki preporuceni proizvod-->
-            @if (preporucenaListaProizvoda.Any()) 
+            @if (proizvodService.PreporuceniProizvodi is not null) 
             {
                 <div class="control-container text-dark">
                     <SfCarousel ButtonVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="true">
                         <ChildContent>
                             <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 3 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
-                            @foreach (Proizvod proizvod in preporucenaListaProizvoda!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
+                            @foreach (Proizvod proizvod in proizvodService.PreporuceniProizvodi!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
                             {
                                 <!--Predstavlja jedan proizvod u slideshow-u-->
                                 <CarouselItem>
@@ -96,24 +96,13 @@
 
 
 @code {
-    List<Proizvod>? preporucenaListaProizvoda = new();
 
-    // pokrece metodu GetPreporuceneProizvode() pri inicijalizaciji ove komponente
     protected override async Task OnInitializedAsync()
     {
-        await GetPreporuceneProizvode();
-    }
-
-    private async Task GetPreporuceneProizvode()
-    {
-        // ? predstavlja null conditional operator, metoda clear ce biti pozvana samo ako listaProizvoda nije null
-        preporucenaListaProizvoda?.Clear();
-
         bool preporuceniProizvod = true;
-        await clientService.GetProizvode(preporuceniProizvod);
-        preporucenaListaProizvoda = clientService.PreporuceniProizvodi;
+        await proizvodService.GetProizvode(preporuceniProizvod);
+        proizvodService.ProizvodAction += StateHasChanged;
     }
-
 
     //Ova metoda, na temelju broja dana koji su prošli od postavljanja proizvoda(brojDanaNakonPostavljanja) i maksimalnog dozvoljenog broja dana(maxDana), određuje je li proizvod još uvek "nov" ili ne.
     string GetNovuLabelu(DateTime datumPostavljanja)
@@ -130,5 +119,10 @@
         int maxDuzina = 100;
         int duzinaOpisa = opis.Length;
         return duzinaOpisa > maxDuzina ? $"{opis.Substring(0,100)}{dodajTacke}" :  opis;
+    }
+
+    public void Dispose()
+    {
+        proizvodService.ProizvodAction -= StateHasChanged;
     }
 }

@@ -1,0 +1,42 @@
+﻿@page "/proizvodi"
+@implements IDisposable;
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2">
+            <KategorijeComponent KategorijaKlikEvent="KategorijaKlikEvent" OsnovnaKategorijaKlikEvent="OsnovnaKategorijaKlik" />
+        </div>
+    </div>
+</div>
+
+@code
+{
+    protected async override Task OnInitializedAsync()
+    {
+        await UcitajPodatke();
+        proizvodService.ProizvodAction += StateHasChanged;
+    }
+
+    private async void KategorijaKlikEvent(int kategorijaId)
+    {
+        if (kategorijaId == 0) return;
+        await proizvodService.GetProizvodeIsteKategorije(kategorijaId);
+    }
+
+    private async void OsnovnaKategorijaKlik()
+    {
+        proizvodService.ProizvodiIsteKategorije = null!;
+        await UcitajPodatke();
+    }
+
+    async Task UcitajPodatke()
+    {
+        bool preporuceno = false;
+        await proizvodService.GetProizvode(preporuceno);
+    }
+
+    public void Dispose()
+    {
+        proizvodService.ProizvodAction -= StateHasChanged;
+    }
+}

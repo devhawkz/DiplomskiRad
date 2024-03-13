@@ -11,4 +11,6 @@ public interface IProizvodService
     Task GetProizvode(bool preporuceniProizvod);
     List<Proizvod> SviProizvodi { get; set; }
     List<Proizvod> PreporuceniProizvodi { get; set; }
+    Task GetProizvodeIsteKategorije(int kategorijaId);
+    List<Proizvod> ProizvodiIsteKategorije { get; set; }
 }

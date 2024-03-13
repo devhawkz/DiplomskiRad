@@ -1,6 +1,5 @@
 ﻿@page "/dodaj-proizvod"
-@using Client.Pages.Shared;
-
+@implements IDisposable;
 
 <div class="container">
     <div class="row">
@@ -16,6 +15,22 @@
                              <label class="form-label">Naziv</label>
                              <InputText @bind-Value="proizvod.Naziv" class="form-control"></InputText>
                          </div>
+
+                         <!-- Prikaz kategorije -->
+                        <div class="form-group">
+                            <label class="form-label">Izaberite kategoriju</label>
+                            <InputSelect class="form-select form-control-sm" @bind-Value="@proizvod.KategorijaId">
+                                @if(kategorijaService.SveKategorije is not null)
+                                {
+                                    <option selected>-- Izaberite kategoriju -- </option>
+                                    @foreach (var kategorija in kategorijaService.SveKategorije){
+                                        <option value="@kategorija.Id">@kategorija.Naziv</option>
+                                    }
+                                
+                                }
+                            </InputSelect>
+                           
+                        </div>
 
                          <div class="form-group mt-3">
                              <label class="form-label">Cena</label>
@@ -53,11 +68,12 @@
                      </div>
                      <div class="footer">
                          <div class="form-group mt-3">
-                             @if (PrikaziDugmeSacuvaj)
+                            @if (messageDialogService.PrikaziDugmeSacuvaj)
                             {
-                                <button type="submit" class="btn btn-outline-primary">Sačuvaj  <i class="fa fa-plus"></i></button>
+                                <button type="submit" class="btn btn-outline-primary">Sačuvaj proizvod   <i class="fa fa-plus"></i></button>
+                               
                             }
-                            <BusyDugmeKomponenta PrikaziBusyDugme="PrikaziBusyDugme"></BusyDugmeKomponenta>
+                            <BusyDugmeComponent PrikaziBusyDugme="messageDialogService.PrikaziBusyDugme"></BusyDugmeComponent>
                         </div>
                     </div>
                 </div>
@@ -67,44 +83,57 @@
 </div>
 
 <!--Ukljucuje MessageDialog komponentu u render ove komponente i dodeljuje promenljivoj messageDialog referencu ka komponenti MessageDialog-->
-<MessageDialog @ref="messageDialog"></MessageDialog>
+<MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
 
 @code {
     Proizvod proizvod = new();
 
     string uploadSlikePoruka = string.Empty;
 
-    //def se promenljiva messageDialog koja je tipa MessageDialog i pomocu nje se pristupa komponenti MessageDialog
-    MessageDialog? messageDialog;
-    public bool PrikaziBusyDugme { get; set; }
-    public bool PrikaziDugmeSacuvaj { get; set; } = true;
+    protected override async void OnInitialized()
+    {
+        await kategorijaService.GetKategorije();
+
+        // ako se desi promena u listi kategorija pretplatom na ovaj delegat izvrsicemo promenu ovoj komponenti, odnosno ponovo ce se ucitati stranica
+        kategorijaService.KategorijaAction += StateHasChanged;
+        // vidi u DodajKategorijuComponent
+        messageDialogService.Action += StateHasChanged;
+    }
 
     async Task UpravljajProizvodom()
     {
         // kada se klikne na dugme sacuvaj onemogucava se ponovni klik na to
-        PrikaziDugmeSacuvaj = false;
-        PrikaziBusyDugme = !PrikaziDugmeSacuvaj;
+        messageDialogService.PrikaziDugmeSacuvaj = false;
+        messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
 
         //ako nije izabrana slika
         if (string.IsNullOrEmpty(proizvod.Base64Img))
         {
             //Ova metoda  postavlja vrednosti za dijalog poruke.postavlja se tip poruke na "warning" (upozorenje) i tekst poruke na "Morate da dodate sliku!".
-            messageDialog!.SetDialogValues("warning", "Morate da dodate sliku!");
+            messageDialogService.messageDialog!.SetDialogValues("warning", "Morate da dodate sliku!");
 
             // prikazuje se poruka i menja se stanje komponente
-            SetMessageDialog();
+            messageDialogService.SetMessageDialog();
             return;
         }
 
-        var (flag, poruka) = await clientService.DodajProizvod(proizvod);
+        var (flag, poruka) = await proizvodService.DodajProizvod(proizvod);
 
         if (flag)
-            messageDialog!.SetDialogValues("success", poruka);
+        {
+            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+
+            // kako bi se resetovala forma
+            proizvod = new();
+        }
 
         else
-            messageDialog!.SetDialogValues("danger", poruka);
+            messageDialogService.messageDialog!.SetDialogValues("danger", poruka);
 
-        SetMessageDialog();
+        messageDialogService.SetMessageDialog();
+
+        // signalizacija da je metoda zavrsena
+        return;
     }
 
     //ova metoda asinhrono učitava sliku iz foldera, pretvara je u Base64 format i postavlja taj rezultat u odgovarajuće svojstvo objekta, uz dodatnu provjeru da li je slika u ispravnom formatu
@@ -112,10 +141,10 @@
     async Task UploadSliku(InputFileChangeEventArgs e)
     {
         //proverava da li se u nazivu fajla nalazi .png ekstenzija (string)
-        if (e.File.Name.ToLower().Contains(".jpg"))
+        if (e.File.Name.ToLower().Contains(".png"))
         {
             // postavlja format slike na png
-            var format = "image/jpg";
+            var format = "image/png";
 
             //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u jpg formatu, a dimenzije su ograničene na 500x500 piksela.
             var resizeSliku = await e.File.RequestImageFileAsync(format, 500, 500);
@@ -140,17 +169,14 @@
             return;
         }
 
-        uploadSlikePoruka = "Samo slika u jpg formatu.";
+        uploadSlikePoruka = "Samo slika u png formatu.";
         return;
     }
 
-    private async void SetMessageDialog()
+    public void Dispose()
     {
-        await messageDialog!.PrikaziPoruku();
-        PrikaziBusyDugme = false;
-        PrikaziDugmeSacuvaj = !PrikaziBusyDugme;
-
-        // obavestava komponentu da se njeno stanje promenilo, to ce izazvati ponovno ucitavanje te komponente kada je to moguce
-        StateHasChanged();
+        // vidi u DodajKategorijuComponent
+        messageDialogService.Action -= StateHasChanged;
+        kategorijaService.KategorijaAction -= StateHasChanged;
     }
 }
