@@ -48,4 +48,22 @@ internal class Tools : IToolsService
 
     // cita se odgovor iz response body-ja sa servera(sa api-ja) kao json string, sadrzi service response objekat u obliku Json objekta
     public async Task<string> CitajSadrzaj(HttpResponseMessage odgovor) => await odgovor.Content.ReadAsStringAsync();
+
+
+    //Ova metoda, na temelju broja dana koji su prošli od postavljanja proizvoda(brojDanaNakonPostavljanja) i maksimalnog dozvoljenog broja dana(maxDana), određuje je li proizvod još uvek "nov" ili ne.
+    public string GetNovuLabelu(DateTime datumPostavljanja)
+    {
+        int maxDana = 30;
+        int brojDanaNakonPostavljanja = (DateTime.Now - datumPostavljanja).Days;
+        return brojDanaNakonPostavljanja <= maxDana ? "Novo" : null!;
+    }
+
+    // ako je opis duzi od 100 karaktera, prikazi samo prvih sto karaktera, a ostatak sakri sa 3 tacke
+    public string GetOpis(string opis)
+    {
+        string dodajTacke = "...";
+        int maxDuzina = 100;
+        int duzinaOpisa = opis.Length;
+        return duzinaOpisa > maxDuzina ? $"{opis.Substring(0, 100)}{dodajTacke}" : opis;
+    }
 }

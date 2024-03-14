@@ -109,6 +109,26 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         ProizvodAction?.Invoke();
     }
 
+    // metoda koja daje nasumicni preporuceni proizvod
+    public Proizvod GetNasumicniProizvod()
+    {
+        if (PreporuceniProizvodi is null) return null!;
+
+        Random nasumice = new();
+        
+        // najmanji id
+        int min = PreporuceniProizvodi.Min(_ => _.Id);
+        
+        //najveci id, + 1 je kako bi se i maks id ukljucio u nasumicni odabir
+        int max = PreporuceniProizvodi.Max(_ => _.Id) + 1;
+
+        // random id izmedju ta 2, ukljucujuci i njih
+        int nasumicniId = nasumice.Next(min, max);
+
+        // ako neki proizvod je sa id-jem koji ima istu vrednost kao nasumicniId vrati ga, ako ne postoji takav proizvod vrati null
+        return PreporuceniProizvodi.FirstOrDefault(_ => _.Id == nasumicniId)!;
+    }
+    
     /*KATEGORIJE*/
 
     // Prilikom dodavanja nove kategorije Post metodom, ako je uspesno dodata onda se poziva Get metoda koja vraca listu svih kategorija iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda

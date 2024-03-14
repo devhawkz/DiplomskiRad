@@ -11,5 +11,7 @@ public interface IToolsService
     public IList<T> DeserializeJsonStringList<T>(string jsonString);
     public ServiceResponse ProveriStatusKod(HttpResponseMessage odgovor);
     public Task<string> CitajSadrzaj(HttpResponseMessage odgovor);
+    public string GetNovuLabelu(DateTime datumPostavljanja);
+    public string GetOpis(string opis);
 
 }

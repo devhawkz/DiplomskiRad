@@ -7,7 +7,7 @@
             @if (proizvodService.PreporuceniProizvodi is not null) 
             {
                 <div class="control-container text-dark">
-                    <SfCarousel ButtonVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="true">
+                    <SfCarousel ButtonsVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="false">
                         <ChildContent>
                             <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 3 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
                             @foreach (Proizvod proizvod in proizvodService.PreporuceniProizvodi!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
@@ -32,7 +32,7 @@
                                                                 
                                                                 <!--Ako datum postavljanja proizvoda nije stariji od 30 dana stajace novo-->
                                                                 <span class="badge rounded-pill bg-primary fs-6">
-                                                                    @(GetNovuLabelu(proizvod.DatumPostavljanja))
+                                                                    @(toolsService.GetNovuLabelu(proizvod.DatumPostavljanja))
                                                                 </span>
                                                                 
                                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-family:sans serif; font-size:11px;">
@@ -49,7 +49,7 @@
                                                 <p class="text-muted fs-5 w-75" style="text-align:justify-all; font-family:Cambria">
                                                     
                                                     <!--Ne prikazujemo ceo Opis vec neki manji deo, do 100 karaktera max-->
-                                                    @(GetOpis(proizvod.Opis))
+                                                    @(toolsService.GetOpis(proizvod.Opis))
                                                 </p>
                                             </div>
 
@@ -104,22 +104,7 @@
         proizvodService.ProizvodAction += StateHasChanged;
     }
 
-    //Ova metoda, na temelju broja dana koji su prošli od postavljanja proizvoda(brojDanaNakonPostavljanja) i maksimalnog dozvoljenog broja dana(maxDana), određuje je li proizvod još uvek "nov" ili ne.
-    string GetNovuLabelu(DateTime datumPostavljanja)
-    {
-        int maxDana = 30;
-        int brojDanaNakonPostavljanja = (DateTime.Now - datumPostavljanja).Days;
-        return brojDanaNakonPostavljanja <= maxDana ? "Novo" : null!;
-    }
-
-    // ako je opis duzi od 100 karaktera, prikazi samo prvih sto karaktera, a ostatak sakri sa 3 tacke
-    string GetOpis(string opis)
-    {
-        string dodajTacke = "...";
-        int maxDuzina = 100;
-        int duzinaOpisa = opis.Length;
-        return duzinaOpisa > maxDuzina ? $"{opis.Substring(0,100)}{dodajTacke}" :  opis;
-    }
+    
 
     public void Dispose()
     {
