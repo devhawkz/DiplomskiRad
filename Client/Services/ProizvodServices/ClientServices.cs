@@ -112,21 +112,22 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     // metoda koja daje nasumicni preporuceni proizvod
     public Proizvod GetNasumicniProizvod()
     {
-        if (PreporuceniProizvodi is null) return null!;
+        if (PreporuceniProizvodi is null) 
+            return null!;
 
-        Random nasumice = new();
-        
+        Random randomNumbers = new();
+
         // najmanji id
         int min = PreporuceniProizvodi.Min(_ => _.Id);
-        
+
         //najveci id, + 1 je kako bi se i maks id ukljucio u nasumicni odabir
         int max = PreporuceniProizvodi.Max(_ => _.Id) + 1;
 
         // random id izmedju ta 2, ukljucujuci i njih
-        int nasumicniId = nasumice.Next(min, max);
+        int randomId = randomNumbers.Next(min, max);
 
         // ako neki proizvod je sa id-jem koji ima istu vrednost kao nasumicniId vrati ga, ako ne postoji takav proizvod vrati null
-        return PreporuceniProizvodi.FirstOrDefault(_ => _.Id == nasumicniId)!;
+        return PreporuceniProizvodi.FirstOrDefault(_ => _.Id == randomId)!;
     }
     
     /*KATEGORIJE*/
