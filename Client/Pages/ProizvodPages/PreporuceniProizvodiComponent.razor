@@ -1,40 +1,43 @@
 ﻿@implements IDisposable;
 
-<div class="container-fluid mt-5">
-    <div class="row">
-        <div class="col-md-12 col-sm-12">
-            <hr />
-            <span style="font-family:MojFont">Najprodavanije</span>
-            <div class="card border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-evenly align-items-center">
-                        
-                        <img src="../resursi/unazad.png" width="30" height="30" id="styleCursor" @onclick="PrethodnoDugme" />
-                        @if (preporucenaListaProizvoda is null) return;
-                        @foreach (var proizvod in preporucenaListaProizvoda)
-                        {
-                            <div class="card">
-                                <div class="card-body">
-                                    @if (proizvod.DatumPostavljanja.AddDays(30) > DateTime.Now)
-                                    {
-                                        <span class="badge bg-primary d-flex  align-items-end float-end" style="width:50px">Novo</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-none d-flex  align-items-end float-end" style="width:50px; height:20px;"></span>
-                                    }
-                                    <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
-                                    <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@proizvod.Naziv</div>
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <hr />
+                <span style="font-family:MojFont">Najprodavanije</span>
+                <div class="card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-evenly align-items-center">
+
+                            <img src="../resursi/unazad.png" width="30" height="30" id="styleCursor" @onclick="PrethodnoDugme" />
+                            @if (preporucenaListaProizvoda is null) return;
+                            @foreach (var proizvod in preporucenaListaProizvoda)
+                            {
+                                <div class="card">
+                                    <div class="card-body">
+                                        @if (proizvod.DatumPostavljanja.AddDays(30) > DateTime.Now)
+                                        {
+                                            <span class="badge bg-primary d-flex  align-items-end float-end" style="width:50px">Novo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-none d-flex  align-items-end float-end" style="width:50px; height:20px;"></span>
+                                        }
+                                        <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
+                                        <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@proizvod.Naziv</div>
+                                    </div>
                                 </div>
-                            </div>
-                        }
-                        <img src="../resursi/unapred.png" width="30" height="30" id="styleCursor" @onclick="NarednoDugme" />
+                            }
+                            <img src="../resursi/unapred.png" width="30" height="30" id="styleCursor" @onclick="NarednoDugme" />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+
+
 
 @code{
     List<Proizvod>preporucenaListaProizvoda = new();

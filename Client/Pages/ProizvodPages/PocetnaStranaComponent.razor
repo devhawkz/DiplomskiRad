@@ -1,98 +1,112 @@
 ﻿@implements IDisposable;
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <!--Ako postoji neki preporuceni proizvod-->
-            @if (proizvodService.PreporuceniProizvodi is not null) 
-            {
-                <div class="control-container text-dark">
-                    <SfCarousel ButtonsVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="false">
-                        <ChildContent>
-                            <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 3 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
-                            @foreach (Proizvod proizvod in proizvodService.PreporuceniProizvodi!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
-                            {
-                                <!--Predstavlja jedan proizvod u slideshow-u-->
-                                <CarouselItem>
+@if(proizvodService.IsVisible)
+{
+    <LoadingPage/>
+}
 
-                                    <!--Deo za sliku-->
-                                    <figure class="img-container">
-                                        <img src="@proizvod.Base64Img" width="250" height="380" class="float-end" style="cursor:pointer" />
-                                    </figure>
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!--Ako postoji neki preporuceni proizvod-->
+                @if (proizvodService.PreporuceniProizvodi is not null)
+                {
+                    <div class="control-container text-dark">
+                        <SfCarousel ButtonsVisibility="CarouselButtonVisibility.VisibleOnHover" AnimationEffect="CarouselAnimationEffect.Slide" AutoPlay="true" ShowIndicators="false">
+                            <ChildContent>
+                                <!--Uzima proizvod po proizvod iz liste koja je sortirana na osnovu datuma postavljanja opadajuce, uzima samo 3 proizvoda za slideshow(karusel), u njemu mogu da se nadju samo proizvodi ciji datum postavljanja nije stariji od 30 dana-->
+                                @foreach (Proizvod proizvod in proizvodService.PreporuceniProizvodi!.OrderByDescending(_ => _.DatumPostavljanja).Take(3)!)
+                                {
+                                    <!--Predstavlja jedan proizvod u slideshow-u-->
+                                    <CarouselItem>
 
-                                    <!--Deo za naziv, opis, kolicinu-->
-                                    <div class="d-flex justify-content-center">
-                                        <div style="position:absolute; bottom:50px;">
-                                            <div class="vstack gap-3 mb-3">
-                                                <div>
-                                                    <p>
-                                                        <span style="font-family:impact; text-indent:2px; cursor:pointer" class="text-dark fw-bold display-2">
-                                                            @proizvod.Naziv
-                                                            <sup style="font-family:'Courier New'">
-                                                                
-                                                                <!--Ako datum postavljanja proizvoda nije stariji od 30 dana stajace novo-->
-                                                                <span class="badge rounded-pill bg-primary fs-6">
-                                                                    @(toolsService.GetNovuLabelu(proizvod.DatumPostavljanja))
-                                                                </span>
-                                                                
-                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-family:sans serif; font-size:11px;">
-                                                                    
-                                                                    <!--Ako na lageru imamo samo jedan takav proizvod prikazi jedan, ako imamo vise prikazi kolicina - 1 + (npr ako imamo 2 prikazi 1+)--->
-                                                                    @((proizvod.Kolicina - 1) > 0 ? $"{proizvod.Kolicina - 1}+" : proizvod.Kolicina)
-                                                                    <span class="visually-hidden">nepročitane poruke</span>
-                                                                </span>
-                                                            </sup>
-                                                        </span>
+                                        <!--Deo za sliku-->
+                                        <figure class="img-container">
+                                            <img src="@proizvod.Base64Img" width="250" height="380" class="float-end" style="cursor:pointer" />
+                                        </figure>
+
+                                        <!--Deo za naziv, opis, kolicinu-->
+                                        <div class="d-flex justify-content-center">
+                                            <div style="position:absolute; bottom:50px;">
+                                                <div class="vstack gap-3 mb-3">
+                                                    <div>
+                                                        <p>
+                                                            <span style="font-family:impact; text-indent:2px; cursor:pointer" class="text-dark fw-bold display-2">
+                                                                @proizvod.Naziv
+                                                                <sup style="font-family:'Courier New'">
+
+                                                                    <!--Ako datum postavljanja proizvoda nije stariji od 30 dana stajace novo-->
+                                                                    <span class="badge rounded-pill bg-primary fs-6">
+                                                                        @(toolsService.GetNovuLabelu(proizvod.DatumPostavljanja))
+                                                                    </span>
+
+                                                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-family:sans serif; font-size:11px;">
+
+                                                                        <!--Ako na lageru imamo samo jedan takav proizvod prikazi jedan, ako imamo vise prikazi kolicina - 1 + (npr ako imamo 2 prikazi 1+)--->
+                                                                        @((proizvod.Kolicina - 1) > 0 ? $"{proizvod.Kolicina - 1}+" : proizvod.Kolicina)
+                                                                        <span class="visually-hidden">nepročitane poruke</span>
+                                                                    </span>
+                                                                </sup>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+
+                                                    <p class="text-muted fs-5 w-75" style="text-align:justify-all; font-family:Cambria">
+
+                                                        <!--Ne prikazujemo ceo Opis vec neki manji deo, do 100 karaktera max-->
+                                                        @(toolsService.GetOpis(proizvod.Opis))
                                                     </p>
                                                 </div>
 
-                                                <p class="text-muted fs-5 w-75" style="text-align:justify-all; font-family:Cambria">
-                                                    
-                                                    <!--Ne prikazujemo ceo Opis vec neki manji deo, do 100 karaktera max-->
-                                                    @(toolsService.GetOpis(proizvod.Opis))
-                                                </p>
-                                            </div>
+                                                <!--Deo za dugmice-->
+                                                <div class="hstack gap-1 d-flex justify-content-center">
+                                                    <button class="btn btn-secondary fw-bold" id="styleButton">
+                                                        <i class="fa fa-list"></i> Detalji
+                                                    </button>
 
-                                            <!--Deo za dugmice-->
-                                            <div class="hstack gap-1 d-flex justify-content-center">
-                                                <button class="btn btn-secondary fw-bold" id="styleButton">
-                                                    <i class="fa fa-list"></i> Detalji
-                                                </button>
-                                                
-                                                <button class="btn btn-outline-danger fw-bold" id="styleButton">
-                                                    <i class="fa fa-cart-plus "></i> KUPI ODMAH
-                                                </button>
+                                                    <button class="btn btn-outline-danger fw-bold" id="styleButton">
+                                                        <i class="fa fa-cart-plus "></i> KUPI ODMAH
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </CarouselItem>
-                            }
-                        </ChildContent>
-                        
-                        <!--Strelica unazad -->
-                        <PreviousButtonTemplate>
-                            <img src="../resursi/unazad.png" width="40" height="40" id="styleCursor" />
-                        </PreviousButtonTemplate>
+                                    </CarouselItem>
+                                }
+                            </ChildContent>
 
-                        <!--Strelica unapred -->
-                        <NextButtonTemplate>
-                            <img src="../resursi/unapred.png" width="40" height="40" id="styleCursor"  />
-                        </NextButtonTemplate>
+                            <!--Strelica unazad -->
+                            <PreviousButtonTemplate>
+                                <img src="../resursi/unazad.png" width="40" height="40" id="styleCursor" />
+                            </PreviousButtonTemplate>
 
-                        <!--3 tacke -->
-                        <IndicatorsTemplate>
-                            <div class="indicator"> </div>
-                        </IndicatorsTemplate>
-                    </SfCarousel>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-info">Nijedan proizvod nije dostupan. </div>
-            }
+                            <!--Strelica unapred -->
+                            <NextButtonTemplate>
+                                <img src="../resursi/unapred.png" width="40" height="40" id="styleCursor" />
+                            </NextButtonTemplate>
+
+                            <!--3 tacke -->
+                            <IndicatorsTemplate>
+                                <div class="indicator"> </div>
+                            </IndicatorsTemplate>
+                        </SfCarousel>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">Nijedan proizvod nije dostupan. </div>
+                }
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- PREPORUCENI PROIZVODI-->
+    <div class="col-md-12 mt-5">
+        <PreporuceniProizvodiComponent />
+    </div>
+}
+
 
 
 @code {

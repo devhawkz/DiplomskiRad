@@ -18,6 +18,8 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     public List<Proizvod> SviProizvodi { get; set; }
     public List<Proizvod> PreporuceniProizvodi { get; set; }
     public List<Proizvod> ProizvodiIsteKategorije { get; set; }
+    
+    public bool IsVisible { get; set; }
 
     /* PROIZVODI */
 
@@ -59,9 +61,11 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     {
 
         if (!preporuceniProizvod && SviProizvodi is null)
-        { 
+        {
+            IsVisible = true; // pokrece se screen loader
             SviProizvodi = await GetProizvodeSaApi(preporuceniProizvod);
-            ProizvodAction?.Invoke();
+            IsVisible = false; // gasi se screen loader
+            ProizvodAction?.Invoke(); 
             return;
         }
 
@@ -70,7 +74,9 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         {
             if (preporuceniProizvod && PreporuceniProizvodi is null)
             {
+                IsVisible = true;
                 PreporuceniProizvodi = await GetProizvodeSaApi(preporuceniProizvod);
+                IsVisible = false;
                 ProizvodAction?.Invoke();
                 return;
             }
@@ -117,17 +123,9 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
 
         Random randomNumbers = new();
 
-        // najmanji id
-        int min = PreporuceniProizvodi.Min(_ => _.Id);
+        int randomId = randomNumbers.Next(0, PreporuceniProizvodi.Count);
 
-        //najveci id, + 1 je kako bi se i maks id ukljucio u nasumicni odabir
-        int max = PreporuceniProizvodi.Max(_ => _.Id) + 1;
-
-        // random id izmedju ta 2, ukljucujuci i njih
-        int randomId = randomNumbers.Next(min, max);
-
-        // ako neki proizvod je sa id-jem koji ima istu vrednost kao nasumicniId vrati ga, ako ne postoji takav proizvod vrati null
-        return PreporuceniProizvodi.FirstOrDefault(_ => _.Id == randomId)!;
+        return PreporuceniProizvodi[randomId]!;
     }
     
     /*KATEGORIJE*/
