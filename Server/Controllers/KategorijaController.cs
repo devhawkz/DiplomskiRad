@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Repository.KategorijaResposities;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;

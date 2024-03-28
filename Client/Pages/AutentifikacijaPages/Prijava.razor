@@ -1,0 +1,84 @@
+﻿@page "/prijava"
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+;
+
+@using Authentication;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using SharedLibrary.DTOs
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="Korisnik" Enhance OnValidSubmit="UpravljanjePrijavom">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="card-header">Prijava</div>
+                <div class="card-body">
+
+                    @*EMAIL*@
+                    <div class="form-group mb-3">
+                        <input @bind="Korisnik.Email"
+                               class="form-control"
+                               type="email"
+                               placeholder="Email adresa" />
+                    </div>
+
+                    @*Lozinka*@
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <input class="form-control"
+                                   @bind="Korisnik.Lozinka"
+                                   type="password"
+                                   placeholder="Lozinka"
+                                   aria-label="Lozinka"
+                                   aria-describedby="Lozinka" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary float-end" type="submit">Prijava</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+@code {
+    public PrijavaDTO Korisnik { get; set; } = new();
+
+    async Task UpravljanjePrijavom()
+    {
+        // ova metoda vraca objekat PrijavaResponseKlase
+        var (flag, token, poruka) = await nalogService.Prijava(Korisnik);
+
+        if(flag)
+        {
+            // poruka koja se prikazuje korisniku
+            string customPoruka = $"{poruka}{Environment.NewLine}{token}";
+
+            // reira se prilagođena poruka koja uključuje originalnu poruku i token, a zatim se prikazuje korisniku koristeći JavaScript alert funkciju.
+            await js.InvokeVoidAsync("alert", customPoruka);
+
+            // Ovo može biti korisno za brisanje bilo kakvih prethodno unesenih podataka o korisniku nakon uspješne prijave.
+            Korisnik = new();
+
+            //  Dobavlja se prilagođeni CustomAuthenticationStateProvider iz AuthStateProvider servisa
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+
+            //Poziva se metoda UpdateAuthenticationState prilagođenog CustomAuthenticationStateProvider kako bi se ažuriralo stanje autentikacije na osnovu dobijenog tokena.
+            await customAuthStateProvider.UpdateAuthenticationState(token);
+
+            //korisnik se preusmjerava na početnu stranicu, a forceLoad parametar je postavljen na true kako bi se osiguralo da se stranica potpuno ponovno učita.
+            NavManager.NavigateTo("/", forceLoad: true);
+        }
+
+        else
+        {
+            await js.InvokeVoidAsync("alert", poruka);
+            return;
+        }
+    }
+
+}

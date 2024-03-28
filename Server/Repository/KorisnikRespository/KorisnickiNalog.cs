@@ -6,6 +6,7 @@ using SharedLibrary.Responses;
 using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Server.Repository.KorisnikRespository;
@@ -75,7 +76,7 @@ public class KorisnickiNalog(UserManager<AppKorisnik> userManager, RoleManager<I
         // sluzi za upravljanje korisnickim info tokom trajanja sesije, .First() vraca prvu rolu korisnika
         var sesijaKorisnika = new SesijaKorisnika(getKorisnika.Id, getKorisnika.Ime, getKorisnika.Email, getRoluKorisnika.First());
 
-        string token = GenerisiToken(sesijaKorisnika);
+        string token= GenerisiToken(sesijaKorisnika);
         return new PrijavaResponse(true, token, "Uspešna prijava");
     }
 
@@ -98,11 +99,12 @@ public class KorisnickiNalog(UserManager<AppKorisnik> userManager, RoleManager<I
             issuer: config["JWT:Issuer"],
             audience: config["JWT:Audience"],
             claims: korisnickiClaims,
-            expires: DateTime.Now.AddDays(1),
+            expires: DateTime.Now.AddMinutes(15),
             signingCredentials: credentials
             );
 
-        //Ova linija koda generira JWT token iz predanog tokena i vraća ga kao string
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        //Ova linija koda generira JWT token iz predanog tokena
+       return new JwtSecurityTokenHandler().WriteToken(token);
+
     }
 }

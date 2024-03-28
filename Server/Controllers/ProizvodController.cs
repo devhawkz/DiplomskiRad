@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Repository.ProizvodRespositories;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
@@ -9,8 +10,9 @@ namespace Server.Controllers;
 [ApiController]
 public class ProizvodController(IProizvod proizvodService) : ControllerBase
 {
+
     [HttpGet]
-     public async Task<ActionResult<List<Proizvod>>> GetProizvode(bool preporuceniProizvodi)
+    public async Task<ActionResult<List<Proizvod>>> GetProizvode(bool preporuceniProizvodi)
     {
         var proizvodi = await proizvodService.GetProizvode(preporuceniProizvodi);
         return Ok(proizvodi);

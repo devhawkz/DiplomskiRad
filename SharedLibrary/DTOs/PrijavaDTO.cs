@@ -13,4 +13,6 @@ public class PrijavaDTO
     [Required]
     [DataType(DataType.Password)]
     public string? Lozinka { get; set; } = string.Empty;
+
+
 }

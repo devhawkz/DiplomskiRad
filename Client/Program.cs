@@ -7,6 +7,11 @@ using Client.Services.ProizvodServices;
 using Client.Services.ToolsService;
 using Client.Services.KategorijaServices;
 using Client.Services.DialogServices;
+using Blazored.LocalStorage;
+using Client.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Client.Services.AuthServices;
+
 
 namespace Client;
 
@@ -20,15 +25,21 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7151/") });
+
+        builder.Services.AddBlazoredLocalStorage();
+        builder.Services.AddAuthorizationCore();
+        builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
         builder.Services.AddScoped<IProizvodService, ClientServices>();
         builder.Services.AddSingleton<IToolsService, Tools>();
         builder.Services.AddScoped<IKategorijaService, ClientServices>();
         builder.Services.AddScoped<MessageDialogService>();
+        builder.Services.AddScoped<INalog, NalogService>();
 
-
+       
         builder.Services.AddSyncfusionBlazor();
+
 
         await builder.Build().RunAsync();
     }

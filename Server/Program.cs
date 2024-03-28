@@ -12,6 +12,8 @@ using Swashbuckle.AspNetCore.Filters;
 using static System.Net.WebRequestMethods;
 using Syncfusion.Blazor;
 using Server.Repository.KorisnikRespository;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.Net.Http.Headers;
 
 namespace Server;
 
@@ -85,6 +87,16 @@ public class Program
         });
 
 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("RequireAdmin", policy =>
+            policy.RequireRole("Admin"));
+
+            options.AddPolicy("RequireUser", policy =>
+            policy.RequireRole("User"));
+        });
+
+
         // Dodavanje autentifikacije u swaggerUI
         //koristi se u ASP.NET Core aplikacijama kako bi se dodala podrška za Swagger (OpenAPI) dokumentaciju u Dependency Injection kontejner aplikacije, Nakon dodavanja podrške za Swagger dokumentaciju, možete konfigurirati Swagger generiranje kako bi se prilagodila potrebama vaše aplikacije. Na primjer, možete dodati opise ruta, verzioniranje API-ja, dodati sigurnosne sheme i druge značajke koje želite uključiti u Swagger dokumentaciju.
 
@@ -115,10 +127,28 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            /*Kod koji ste naveli konfiguriše CORS (Cross-Origin Resource Sharing) politiku u ASP.NET Core aplikaciji. CORS politika omogućava kontrolu nad zahtjevima koji dolaze iz drugih izvora (origin), što je posebno važno u web aplikacijama gdje klijentski kod često komunicira s serverom na drugom originu.
+            
+            U ovom slučaju, politika se konfiguriše da omogući zahtjeve s dva određena izvora `https://localhost:7151/`. To znači da će server prihvatiti zahtjeve samo ako dolaze s ovih adresa.
+
+            Primijetite da nije potrebno stavljati '/' na kraju adresa.Pravilno konfiguriranje CORS politike je ključno za sigurnu i funkcionalnu komunikaciju između klijenta i servera, posebno kada klijentski kod radi u web pregledniku.
+            
+            ova konfiguracija omogućava zahtjevima s određenih origin-a da koriste bilo koju HTTP metodu, ali samo ako sadrže ContentType zaglavlje. Ovo je korisno za precizniju kontrolu nad zahtjevima koji prolaze kroz CORS politiku, čime se povećava sigurnost aplikacije.*/
+            
+            app.UseCors(policy =>
+            {
+                policy.WithOrigins("https://localhost:7151/")
+                .AllowAnyMethod() // : Ova metoda omogućava zahtjevima sa bilo kojom HTTP metodom (GET, POST, PUT, DELETE, itd.) da prođu kroz CORS politiku. To znači da će server prihvatiti zahtjeve s bilo kojom HTTP metodom iz navedenih origin-a.
+                .WithHeaders(HeaderNames.ContentType); //  Ova metoda omogućava zahtjevima da sadrže određeni zaglavlje (header), u ovom slučaju ContentType zaglavlje. ContentType zaglavlje obično se koristi kako bi se označilo koja vrsta sadržaja se nalazi u tijelu zahtjeva (npr. aplikacija/json, text/html, itd.). Ova metoda omogućava samo zahtjeve koji sadrže ContentType zaglavlje da prođu kroz CORS politiku.
+            });
+            
+
             app.UseWebAssemblyDebugging();
         }
 
-      
+
+
         app.UseHttpsRedirection();
 
         app.UseBlazorFrameworkFiles();

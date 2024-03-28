@@ -1,12 +1,9 @@
 ﻿@implements IDisposable;
 
-@if(proizvodService.IsVisible)
-{
-    <LoadingPage/>
-}
 
-else
-{
+
+
+
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -95,17 +92,14 @@ else
                 }
                 else
                 {
-                    <div class="alert alert-info">Nijedan proizvod nije dostupan. </div>
+                    <div class="alert alert-info" style="text-align:center;">Nijedan proizvod nije dostupan. </div>
                 }
             </div>
         </div>
     </div>
 
-    <!-- PREPORUCENI PROIZVODI-->
-    <div class="col-md-12 mt-5">
-        <PreporuceniProizvodiComponent />
-    </div>
-}
+   
+
 
 
 
