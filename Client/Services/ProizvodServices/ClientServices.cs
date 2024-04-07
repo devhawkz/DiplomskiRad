@@ -115,18 +115,7 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         ProizvodAction?.Invoke();
     }
 
-    // metoda koja daje nasumicni preporuceni proizvod
-    public Proizvod GetNasumicniProizvod()
-    {
-        if (PreporuceniProizvodi is null) 
-            return null!;
-
-        Random randomNumbers = new();
-
-        int randomId = randomNumbers.Next(0, PreporuceniProizvodi.Count);
-
-        return PreporuceniProizvodi[randomId]!;
-    }
+    
     
     /*KATEGORIJE*/
 

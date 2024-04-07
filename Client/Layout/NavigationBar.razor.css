@@ -1,9 +1,9 @@
-﻿@font-face {
+﻿﻿@font-face {
     font-family: 'MojFont';
     src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
 }
 
-#topBar{
+#topBar {
     font-family: MojFont;
-    text-align:center;
+    text-align: center;
 }
