@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Repository.KategorijaResposities;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
@@ -16,7 +17,9 @@ namespace Server.Controllers
             return Ok(kategorije);
         }
 
+        
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ServiceResponse>> DodajKategoriju(Kategorija kategorijaModel)
         {
             if (kategorijaModel is null) return BadRequest("Nije izabrana nijedna kategorija");

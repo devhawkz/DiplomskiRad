@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Repository.ProizvodRespositories;
 using SharedLibrary.Models;
 using SharedLibrary.Responses;
@@ -16,7 +17,9 @@ public class ProizvodController(IProizvod proizvodService) : ControllerBase
         return Ok(proizvodi);
     }
 
+    
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ServiceResponse>> DodajProizvode(Proizvod proizvodModel)
     {
         if (proizvodModel is null)
