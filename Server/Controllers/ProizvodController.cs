@@ -19,7 +19,6 @@ public class ProizvodController(IProizvod proizvodService) : ControllerBase
 
     
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ServiceResponse>> DodajProizvode(Proizvod proizvodModel)
     {
         if (proizvodModel is null)

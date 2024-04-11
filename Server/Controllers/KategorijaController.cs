@@ -19,7 +19,6 @@ namespace Server.Controllers
 
         
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ServiceResponse>> DodajKategoriju(Kategorija kategorijaModel)
         {
             if (kategorijaModel is null) return BadRequest("Nije izabrana nijedna kategorija");
