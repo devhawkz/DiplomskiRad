@@ -21,6 +21,8 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     
     public bool IsVisible { get; set; }
 
+    private static readonly Random random = new();
+
     /* PROIZVODI */
 
     // Prilikom dodavanja novog proizvoda Post metodom, ako je uspesno dodat onda se poziva Get metoda koja vraca listu svih proizvoda iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda
@@ -115,8 +117,16 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
         ProizvodAction?.Invoke();
     }
 
-    
-    
+    public Proizvod GetNasumicniProizvod()
+    {
+        if (PreporuceniProizvodi is null || PreporuceniProizvodi.Count == 0)
+            return null!;
+
+        int randomId = random.Next(0, PreporuceniProizvodi.Count);
+
+        return PreporuceniProizvodi[randomId]!;
+    }
+
     /*KATEGORIJE*/
 
     // Prilikom dodavanja nove kategorije Post metodom, ako je uspesno dodata onda se poziva Get metoda koja vraca listu svih kategorija iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda

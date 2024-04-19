@@ -1,6 +1,7 @@
 global using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.Repository.KategorijaResposities;
+using Server.Repository.KorisnikRespositories;
 using Server.Repository.ProizvodRespositories;
 using Server.Repository.Tools;
 
@@ -31,6 +32,7 @@ public class Program
         builder.Services.AddScoped<IProizvod, ProizvodRepository>();
         builder.Services.AddScoped<ITools, ToolsRespository>();
         builder.Services.AddScoped<IKategorija, KategorijaRespository>();
+        builder.Services.AddScoped<IKorisnickiNalog, KorisnickiNalogRespository>();
 
 
         var app = builder.Build();
