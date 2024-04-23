@@ -7,6 +7,8 @@ using Client.Services.ProizvodServices;
 using Client.Services.ToolsService;
 using Client.Services.KategorijaServices;
 using Client.Services.DialogServices;
+using Client.Services.KorisnikServices;
+using Client.Authentication;
 
 namespace Client;
 
@@ -25,7 +27,10 @@ public class Program
         builder.Services.AddScoped<IProizvodService, ClientServices>();
         builder.Services.AddSingleton<IToolsService, Tools>();
         builder.Services.AddScoped<IKategorijaService, ClientServices>();
+        builder.Services.AddScoped<IKorisnikService, KorisnikService>();
+        
         builder.Services.AddScoped<MessageDialogService>();
+        builder.Services.AddScoped<AuthenticationService>();
 
 
         builder.Services.AddSyncfusionBlazor();

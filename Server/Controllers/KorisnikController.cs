@@ -29,4 +29,41 @@ public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
         var odgovor = await nalogService.Prijava(model);
         return Ok(odgovor);
     }
+
+    [HttpGet("korisnik-info")]
+    public async Task<ActionResult<SesijaKorisnika>> GetInfoKorisnika()
+    {
+        var token = GetTokenIzZaglavlja();
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized();
+
+        var getKorisnika = await nalogService.GetKorisnikaPoTokenu(token!);
+        if(getKorisnika is null || string.IsNullOrEmpty(getKorisnika.Email))
+            return Unauthorized();
+
+        return Ok(getKorisnika);
+    }
+
+    private string GetTokenIzZaglavlja()
+    {
+        string token = string.Empty;
+        foreach (var header in Request.Headers)
+        {
+            if (header.Key.ToString().Equals("Authorization"))
+            {
+                token = header.Value.ToString();
+                break; // postoji samo jedna vrednost pod tim kljucem
+            }
+        }
+
+        return token.Split(" ").LastOrDefault()!;
+    }
+
+    [HttpGet("refresh-token")]
+    public async Task<ActionResult<PrijavaResponse>> RefreshToken(PostRefreshTokenDTO model)
+    {
+        if (model is null) return Unauthorized();
+        var rezultat = await nalogService.GetRefreshToken(model);
+        return Ok(rezultat);
+    }
 }

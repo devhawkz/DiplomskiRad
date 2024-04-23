@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Server.Data;
 using Server.Repository.Tools;
 using SharedLibrary.DTOs;
 using SharedLibrary.Responses;
+using System.Net.WebSockets;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Server.Repository.KorisnikRespositories;
 
@@ -124,14 +127,48 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools
 
     }
 
-    public Task<SesijaKorisnika> GetKorisnikaPoTokenu(string token)
+    // ovaj token (parametar metode) se dobija iz zaglavlja http zahteva
+    public async Task<SesijaKorisnika> GetKorisnikaPoTokenu(string token)
     {
-        throw new NotImplementedException();
+        var rezultat = await context.TokenInfo.FirstOrDefaultAsync(_=> _.AccessToken!.Equals(token));
+        if (rezultat is null) return null!;
+
+        var getKorisnikInfo = await context.KorisnickiNalozi.FirstOrDefaultAsync(_ => _.Id ==  rezultat.KorisnickiNalogId);
+        if(getKorisnikInfo is null) return null!;
+
+        if (rezultat.DatumIsteka < DateTime.Now) return null!;
+
+        var getUloguKorisnika = await context.KorisnickeUloge.FirstOrDefaultAsync(_ => _.KorisnickiNalogId == getKorisnikInfo.Id);
+        if(getUloguKorisnika is null) return null!;
+
+        var uloga = await context.Uloge.FirstOrDefaultAsync(_ => _.Id == getUloguKorisnika.UlogaId);
+        if(uloga is null) return null!;
+
+        return new SesijaKorisnika()
+        {
+            Ime = getKorisnikInfo.Ime,
+            Email = getKorisnikInfo.Email,
+            Uloga = uloga.Naziv
+        };
     }
 
-
-    public Task<PrijavaResponse> GetRefreshToken(PostRefreshTokenDTO model)
+    public async Task<PrijavaResponse> GetRefreshToken(PostRefreshTokenDTO model)
     {
-        throw new NotImplementedException();
+        // dekodira iz Base64String-a u binarni niz
+        var dekodiraniToken = WebEncoders.Base64UrlDecode(model.RefreshToken!);
+
+        // dekodira iz binarnog niza u string
+        string normalniToken = Encoding.UTF8.GetString(dekodiraniToken);
+
+        var getToken = await context.TokenInfo.FirstOrDefaultAsync(_ => _.RefreshToken!.Equals(normalniToken));
+        if(getToken is null) return null!;
+
+        // Generisanje novog tokena
+        var (noviAccessToken, noviRefreshToken) = await tools.GenerisiTokene();
+
+        await SacuvajTokenInfo(getToken.KorisnickiNalogId, noviAccessToken, noviRefreshToken);
+        return new PrijavaResponse(true, "refresh-token-completed", noviAccessToken, noviRefreshToken);
+
+
     }
 }
