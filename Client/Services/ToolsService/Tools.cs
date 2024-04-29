@@ -29,7 +29,7 @@ internal class Tools : IToolsService
     // koristi se za generisanje StringContent objekta koji se koristi za HTTP zahtjeve, posebno za slanje JSON podataka na server, objasnjenje koda u svesci -- konvertuje json objekat u StrinContent objekat(niz znakova)
     public StringContent GenerateStringContent(string serialiazedObj) => new(serialiazedObj, System.Text.Encoding.UTF8, "application/json");
 
-    // ova metoda serijalizuje objekat bilo koje klase u Json objekat na osnovu prethodno definisane standardizacije
+    // ova metoda serijalizuje objekat bilo koje klase u Json string objekat na osnovu prethodno definisane standardizacije
     public string SerializeObj<T>(T modelObject) => JsonSerializer.Serialize(modelObject, JsonOptions());
 
     // genericka metoda, vraca objekat tipa T, ova metoda omogućuje brzu i jednostavnu deserializaciju JSON stringa u objekt određenog tipa, koristeći zadane ili prilagođene opcije deserializacije

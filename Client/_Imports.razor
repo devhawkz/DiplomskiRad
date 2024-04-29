@@ -6,17 +6,25 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
 @using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Authorization;
+
 @using Client
 @using Client.Layout;
-@using SharedLibrary.Models;
-@using SharedLibrary.Responses;
-@using Syncfusion.Blazor.Navigations;
 @using Client.Services.ProizvodServices;
 @using Client.Services.KategorijaServices;
 @using Client.Pages.Shared;
 @using Client.Services.DialogServices;
 @using Client.Pages.KategorijaPages;
 @using Client.Services.ToolsService;
+@using Client.Services.KorisnikServices;
+
+
+@using SharedLibrary.Models;
+@using SharedLibrary.Responses;
+@using SharedLibrary.DTOs;
+
+@using Syncfusion.Blazor.Navigations;
+
 
 
 @inject MessageDialogService messageDialogService
@@ -24,4 +32,5 @@
 @inject IKategorijaService kategorijaService;
 @inject IToolsService toolsService;
 @inject IJSRuntime js;
-
+@inject IKorisnikService nalogService;
+@inject AuthenticationStateProvider AuthStateProvider;

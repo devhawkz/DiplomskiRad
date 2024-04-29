@@ -7,5 +7,5 @@ public class TokenInfo
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime DatumKreiranja { get; set; } = DateTime.Now;
-    public DateTime DatumIsteka {  get; set; } = DateTime.Now.AddDays(1);
+    public DateTime DatumIsteka {  get; set; } = DateTime.Now.AddMinutes(15);
 }

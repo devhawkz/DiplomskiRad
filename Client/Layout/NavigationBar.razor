@@ -1,11 +1,20 @@
 ﻿﻿@using Client.Pages.Shared;
+@inject NavigationManager NavManager;
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
 
-        <a class="navbar-brand" style="cursor:pointer">
+        <a class="navbar-brand" href="#">
             <i class="fa fa-cart-shopping text-danger"></i>
             <span class="small text-danger fw-bold">1</span>
+
+            <h6>
+                Pozdrav,
+                <AuthorizeView>
+                    <Authorized> @context.User.Identity!.Name</Authorized>
+                    <NotAuthorized> Gost</NotAuthorized>
+                </AuthorizeView>
+            </h6>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,7 +26,7 @@
                     <a class="nav-link active" aria-current="page" href="#">POCETNA</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="proizvodi">PROIZVODI</a>
+                    <a class="nav-link d-flex align-items-center" href="/proizvodi">PROIZVODI</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="#">SERVISI</a>
@@ -31,13 +40,33 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ACCOUNT
+                        Nalog
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="font-family:sans-serif">
+                        <AuthorizeView>
+                            <Authorized>
+                                <li>
+                                    <button class="btn btn-danger btn-none"> <i class="fa fa-lock-open"></i> Odjava</button>
+                                </li>
+                            </Authorized>
+                        
+                            <NotAuthorized>
+                                @{
+                                    string registracija = "registracija";
+                                    string prijava = "prijava";
+                                }
+
+                                <li>
+                                    <button class="btn btn-none" @onclick="() => Preusmeri(prijava)"> <i class="fa fa-lock"></i> Prijava</button>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
+                            
+                                <li>
+                                    <button class="btn btn-none" @onclick="() => Preusmeri(registracija)"> <i class="fa fa-sign-in"></i> Registracija</button>
+                                </li>
+                            </NotAuthorized>
+                        </AuthorizeView>
                     </ul>
                 </li>
             </ul>
@@ -70,5 +99,10 @@
     {
         PrikaziPretragu = true;
         PrikaziPretraguIkona = !PrikaziPretragu;
+    }
+
+    void Preusmeri(string url)
+    {
+        NavManager.NavigateTo($"nalog/{url}");
     }
 }

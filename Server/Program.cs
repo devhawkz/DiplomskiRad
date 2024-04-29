@@ -33,6 +33,7 @@ public class Program
         builder.Services.AddScoped<ITools, ToolsRespository>();
         builder.Services.AddScoped<IKategorija, KategorijaRespository>();
         builder.Services.AddScoped<IKorisnickiNalog, KorisnickiNalogRespository>();
+        //builder.Services.AddAuthorizationCore();
 
 
         var app = builder.Build();

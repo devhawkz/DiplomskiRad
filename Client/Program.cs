@@ -9,6 +9,8 @@ using Client.Services.KategorijaServices;
 using Client.Services.DialogServices;
 using Client.Services.KorisnikServices;
 using Client.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Blazored.LocalStorage;
 
 namespace Client;
 
@@ -29,11 +31,13 @@ public class Program
         builder.Services.AddScoped<IKategorijaService, ClientServices>();
         builder.Services.AddScoped<IKorisnikService, KorisnikService>();
         
-        builder.Services.AddScoped<MessageDialogService>();
         builder.Services.AddScoped<AuthenticationService>();
-
+        builder.Services.AddScoped<MessageDialogService>();
+        builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+        builder.Services.AddAuthorizationCore();
 
         builder.Services.AddSyncfusionBlazor();
+        builder.Services.AddBlazoredLocalStorage();
 
         await builder.Build().RunAsync();
     }

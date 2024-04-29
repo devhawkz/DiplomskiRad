@@ -1,0 +1,74 @@
+﻿@page "/nalog/registracija"
+@implements IDisposable;
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <EditForm Enhance Model="korisnik" OnValidSubmit="UpravljajRegistracijom">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="card">
+                    <div class="card-header">Registracija</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Ime i prezime</label>
+                            <InputText @bind-Value="korisnik.Ime" class="form-control" />
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-label">Email</label>
+                            <InputText @bind-Value="korisnik.Email" class="form-control" />
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-label">Lozinka</label>
+                            <input type="password" @bind="korisnik.Lozinka" class="form-control" />
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-label">Ponovo unesi lozinku</label>
+                            <input type="password" @bind="korisnik.PotvrdaLozinke" class="form-control" />
+                        </div>
+                        <div class="form-group mt-3">
+                            @if (messageDialogService.PrikaziDugmeSacuvaj)
+                            {
+                                <button class="btn btn-outline-primary float-end" type="submit">Pošalji</button>
+                            }
+                            <BusyDugmeComponent PrikaziBusyDugme=messageDialogService.PrikaziBusyDugme />
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<!--prikazivanje poruke-->
+<MessageDialog @ref="messageDialogService.messageDialog" />
+
+
+@code {
+    KorisnikDTO korisnik = new();
+
+    protected override void OnInitialized() => messageDialogService.Action += StateHasChanged;
+
+    async Task UpravljajRegistracijom()
+    {
+        messageDialogService.PrikaziDugmeSacuvaj = false;
+        messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
+        var (flag, poruka) = await nalogService.Registracija(korisnik);
+
+        if(flag)
+        {
+            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+            korisnik = new();
+        }
+        else
+        {
+            messageDialogService.messageDialog!.SetDialogValues("danger", poruka);
+        }
+        messageDialogService.SetMessageDialog();
+    }
+
+    public void Dispose() => messageDialogService.Action -= StateHasChanged;
+
+}
