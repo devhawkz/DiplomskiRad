@@ -51,16 +51,30 @@
 
     async Task UpravljajPrijavom()
     {
-        var rezultat = await nalogService.Prijava(korisnik);
         messageDialogService.PrikaziDugmeSacuvaj = false;
         messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
+
+        var rezultat = await nalogService.Prijava(korisnik);
 
         if(rezultat.Flag)
         {
             var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
             await customAuthStateProvider.UpdateAuthenticationState(new TokenProp() { Token = rezultat.Token, RefreshToken = rezultat.RefreshToken });
+            messageDialogService.messageDialog!.SetDialogValues("success", rezultat.Poruka);
             NavManager.NavigateTo("/", forceLoad: true);
-        } 
+        }
+
+        else
+        {
+            messageDialogService.messageDialog!.SetDialogValues("danger", rezultat.Poruka);
+            korisnik = new();
+        }
+
+        messageDialogService.SetMessageDialog();
+
+        // signalizacija da je metoda zavrsena
+        return;
+        
     }
 
     public void Dispose()

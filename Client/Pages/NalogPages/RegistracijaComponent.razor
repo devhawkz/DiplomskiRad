@@ -1,5 +1,10 @@
 ﻿@page "/nalog/registracija"
+
+@using Client.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+
 @implements IDisposable;
+@inject NavigationManager NavManager;
 
 <div class="container">
     <div class="row">
@@ -59,12 +64,29 @@
 
         if(flag)
         {
-            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+            var prijavaResponse = await nalogService.Prijava(new PrijavaDTO()
+            {
+                Email = korisnik.Email,
+                Lozinka = korisnik.Lozinka
+            });
+
+            if(prijavaResponse.Flag)
+            {
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new TokenProp() { Token = prijavaResponse.Token, RefreshToken = prijavaResponse.RefreshToken });
+                messageDialogService.messageDialog!.SetDialogValues("success", "Uspešno ste se registrovali i prijavili!");
+                NavManager.NavigateTo("/", forceLoad: true);
+            }
+
+            else
+                messageDialogService.messageDialog!.SetDialogValues("warning", "Registracija je uspešna ali prijava nije!");
+
             korisnik = new();
         }
         else
         {
             messageDialogService.messageDialog!.SetDialogValues("danger", poruka);
+            korisnik = new();
         }
         messageDialogService.SetMessageDialog();
     }

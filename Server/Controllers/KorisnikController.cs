@@ -17,7 +17,26 @@ public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
             return BadRequest("Morate uneti sve podatke!");
 
         var odgovor = await nalogService.Registracija(model);
-        return Ok(odgovor);
+
+        if (!odgovor.Flag)
+            return Ok(odgovor);
+
+        // auto. prijava nakon registacije korisnika
+        PrijavaDTO prijavaModel = new PrijavaDTO()
+        {
+            Email = model.Email,
+            Lozinka = model.Lozinka
+        };
+
+        var prijavaRezultat = await nalogService.Prijava(prijavaModel);
+
+        if (prijavaRezultat.Flag)
+            return Ok(new PrijavaResponse(true, "Uspešna registracija i prijava!", prijavaRezultat.Token, prijavaRezultat.RefreshToken));
+
+        else
+            return Ok(new PrijavaResponse(false, "Prijava nije uspela nakon registracije!", null, null));
+        
+
     }
 
     [HttpPost("prijava")]
@@ -59,7 +78,7 @@ public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
         return token.Split(" ").LastOrDefault()!;
     }
 
-    [HttpGet("refresh-token")]
+    [HttpPost("refresh-token")]
     public async Task<ActionResult<PrijavaResponse>> RefreshToken(PostRefreshTokenDTO model)
     {
         if (model is null) return Unauthorized();

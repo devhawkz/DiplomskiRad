@@ -23,9 +23,12 @@ public class AuthenticationService(HttpClient http, ILocalStorageService lokalno
 
         var response = await GetDetaljeKorisnikaSaApi();
         if (response.IsSuccessStatusCode)
+        {
             return await GetSesijuKorisnika(response);
+        }
 
-        if(http.DefaultRequestHeaders.Contains("Authorization") && response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        // ako je korisniku istekao access token
+        else if (http.DefaultRequestHeaders.Contains("Authorization") && response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
             var encodedToken = Encoding.UTF8.GetBytes(detaljiKorisnika.RefreshToken!);
             var validToken = WebEncoders.Base64UrlEncode(encodedToken);
@@ -33,25 +36,26 @@ public class AuthenticationService(HttpClient http, ILocalStorageService lokalno
 
             var rezultat = await http.PostAsync("api/korisnik/refresh-token", tools.GenerateStringContent(tools.SerializeObj(model)));
 
-            if (rezultat.IsSuccessStatusCode & rezultat.StatusCode == System.Net.HttpStatusCode.OK)
+            if (!rezultat.IsSuccessStatusCode)
             {
-                var apiResponse =  await rezultat.Content.ReadAsStringAsync();
-                var prijavaResponse = tools.DeserializeJsonString<PrijavaResponse>(apiResponse);
-
-                await SetTokenULokalnoSkladiste(tools.SerializeObj(new TokenProp()
-                {
-                    Token = prijavaResponse.Token,
-                    RefreshToken = prijavaResponse.RefreshToken
-                }));
-
-                var callApiAgain = await GetDetaljeKorisnikaSaApi();
-                if (callApiAgain.IsSuccessStatusCode)
-                    return await GetSesijuKorisnika(callApiAgain);
+                Console.WriteLine($"Neuspešno osvežavanje tokena: {rezultat.StatusCode}");
+                return null!;
             }
+
+            var apiResponse = await rezultat.Content.ReadAsStringAsync();
+            var prijavaResponse = tools.DeserializeJsonString<PrijavaResponse>(apiResponse);
+            await SetTokenULokalnoSkladiste(tools.SerializeObj(new TokenProp()
+            {
+                Token = prijavaResponse.Token,
+                RefreshToken = prijavaResponse.RefreshToken
+            }));
+
+            var callApiAgain = await GetDetaljeKorisnikaSaApi();
+            if (callApiAgain.IsSuccessStatusCode)
+                return await GetSesijuKorisnika(callApiAgain);
         }
 
         return null!;
-
     }
 
     private async Task<string?> GetTokenIzLokalnogSkladista() => await lokalnoSkladiste.GetItemAsStringAsync("access_token");

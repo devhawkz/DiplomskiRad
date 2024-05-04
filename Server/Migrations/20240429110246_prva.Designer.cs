@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240427185952_Prva")]
-    partial class Prva
+    [Migration("20240429110246_prva")]
+    partial class prva
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

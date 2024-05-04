@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using Server.Data;
 using Server.Repository.Tools;
 using SharedLibrary.DTOs;
 using SharedLibrary.Responses;
-using System.Net.WebSockets;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Server.Repository.KorisnikRespositories;
@@ -54,7 +51,7 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools
         {
             getKorisnika.RefreshToken = refreshToken;
             getKorisnika.AccessToken = accessToken;
-            getKorisnika.DatumIsteka = DateTime.Now.AddDays(1);
+            getKorisnika.DatumIsteka = DateTime.Now.AddMinutes(15);
             await tools.Sacuvaj();
         }
     }
@@ -161,14 +158,19 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools
         string normalniToken = Encoding.UTF8.GetString(dekodiraniToken);
 
         var getToken = await context.TokenInfo.FirstOrDefaultAsync(_ => _.RefreshToken!.Equals(normalniToken));
-        if(getToken is null) return null!;
+
+        // korisnik pokusava da osvezi access token koriscenjem tokena koji je stariji od svog datuma isteka za 5 minuta ili koriscenjem refresh tokena koji ne postoji u bazi 
+        if (getToken is null || getToken.DatumIsteka < DateTime.Now.AddMinutes(-5))
+            return new PrijavaResponse(false, "Token nije validan ili je istekao!", null, null);
 
         // Generisanje novog tokena
-        var (noviAccessToken, noviRefreshToken) = await tools.GenerisiTokene();
+        if (getToken.DatumIsteka < DateTime.Now.AddMinutes(5))
+        {
+            var (noviAccessToken, noviRefreshToken) = await tools.GenerisiTokene();
+            await SacuvajTokenInfo(getToken.KorisnickiNalogId, noviAccessToken, noviRefreshToken);
+            return new PrijavaResponse(true, "refresh-token-completed", noviAccessToken, noviRefreshToken);
+        }
 
-        await SacuvajTokenInfo(getToken.KorisnickiNalogId, noviAccessToken, noviRefreshToken);
-        return new PrijavaResponse(true, "refresh-token-completed", noviAccessToken, noviRefreshToken);
-
-
+        return new PrijavaResponse(true, "Token je još uvek validan");
     }
 }

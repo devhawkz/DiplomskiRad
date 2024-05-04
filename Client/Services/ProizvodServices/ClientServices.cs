@@ -1,10 +1,11 @@
-﻿using Client.Services.KategorijaServices;
+﻿using Client.Authentication;
+using Client.Services.KategorijaServices;
 using Client.Services.ToolsService;
 
 
 namespace Client.Services.ProizvodServices;
 
-public class ClientServices(HttpClient http, IToolsService toolsService) : IProizvodService, IKategorijaService
+public class ClientServices(HttpClient http, IToolsService toolsService, AuthenticationService authService) : IProizvodService, IKategorijaService
 {
     // postavlja osnovnu rutu za sve metode
     private const string _proizvodBaseUrl = "api/proizvod";
@@ -28,8 +29,11 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     // Prilikom dodavanja novog proizvoda Post metodom, ako je uspesno dodat onda se poziva Get metoda koja vraca listu svih proizvoda iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda
     public async Task<ServiceResponse> DodajProizvod(Proizvod proizvod)
     {
+        await authService.GetDetaljeKorisnika();
+        var privateHttp = await authService.AddZaglavljeToHttpClient();
+
         // serijalizujemo C# objekat (proizvod koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
-        var odgovor = await http.PostAsync(_proizvodBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(proizvod)));
+        var odgovor = await privateHttp.PostAsync(_proizvodBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(proizvod)));
 
         // vraca true ako je status code u opsegu od 200-299
         var rezultat = toolsService.ProveriStatusKod(odgovor);
@@ -132,8 +136,11 @@ public class ClientServices(HttpClient http, IToolsService toolsService) : IProi
     // Prilikom dodavanja nove kategorije Post metodom, ako je uspesno dodata onda se poziva Get metoda koja vraca listu svih kategorija iz baze ( AzuriranjeListeProizvoda(proizvod)),a ako vec postoji u bazi onda se ne poziva Get metoda
     public async Task<ServiceResponse> DodajKategoriju(Kategorija model)
     {
+        await authService.GetDetaljeKorisnika();
+        var privateHttp = await authService.AddZaglavljeToHttpClient();
+
         // serijalizujemo C# objekat (kategoriju koji korisnik zeli da sacuva) pomocu metode SerializeObj, zatim na osnovu tog serijalizovanog objekta generisemo StringContent objekat koji saljemo serveru
-        var odgovor = await http.PostAsync(_kategorijaBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(model)));
+        var odgovor = await privateHttp.PostAsync(_kategorijaBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(model)));
 
         // vraca true ako je status code u opsegu od 200-299
         var rezultat = toolsService.ProveriStatusKod(odgovor);
