@@ -1,5 +1,8 @@
-﻿﻿@using Client.Pages.Shared;
+﻿@using Client.Authentication
+﻿@using Client.Pages.Shared;
+
 @inject NavigationManager NavManager;
+@inject AuthenticationService AuthService;
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -46,7 +49,7 @@
                         <AuthorizeView>
                             <Authorized>
                                 <li>
-                                    <button class="btn btn-danger btn-none"> <i class="fa fa-lock-open"></i> Odjava</button>
+                                    <button class="btn btn-danger btn-none" @onclick="OdjavaKorisnika"> <i class="fa fa-lock-open"></i> Odjava</button>
                                 </li>
                             </Authorized>
                         
@@ -104,5 +107,26 @@
     void Preusmeri(string url)
     {
         NavManager.NavigateTo($"nalog/{url}");
+    }
+
+    async Task OdjavaKorisnika()
+    {
+        var uspesno = await AuthService.Odjava();
+
+        if (uspesno)
+        {
+            messageDialogService.messageDialog!.SetDialogValues("success", "Uspešno ste se odjavili");
+            messageDialogService.SetMessageDialog();
+
+            NavManager.NavigateTo("/", forceLoad: true);
+
+        }
+        else
+        {
+            messageDialogService.messageDialog!.SetDialogValues("danger", "Došlo je do greške prilikom odjave");
+            messageDialogService.SetMessageDialog();
+
+            NavManager.NavigateTo("/", forceLoad: true);
+        }
     }
 }

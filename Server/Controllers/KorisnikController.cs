@@ -85,4 +85,18 @@ public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
         var rezultat = await nalogService.GetRefreshToken(model);
         return Ok(rezultat);
     }
+
+    [HttpPost("odjava")]
+    public async Task<ActionResult> Odjava()
+    {
+        var token = GetTokenIzZaglavlja();
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized("Niste prijavljeni.");
+
+        var rezultat = await nalogService.Odjava(token);
+        if (rezultat)
+            return Ok("Uspešno ste se odjavili.");
+        else
+            return BadRequest("Odjava nije uspela.");
+    }
 }

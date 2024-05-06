@@ -8,5 +8,6 @@ public interface IKorisnickiNalog
     Task<ServiceResponse> Registracija(KorisnikDTO model);
     Task<PrijavaResponse> Prijava(PrijavaDTO model);
     Task<SesijaKorisnika> GetKorisnikaPoTokenu(string token);
-    Task<PrijavaResponse> GetRefreshToken(PostRefreshTokenDTO model); 
+    Task<PrijavaResponse> GetRefreshToken(PostRefreshTokenDTO model);
+    Task<bool> Odjava(string accessToken);
 }

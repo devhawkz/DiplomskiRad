@@ -98,4 +98,15 @@ public class AuthenticationService(HttpClient http, ILocalStorageService lokalno
             }, "AccessTokenAuth"));
     }
 
+    public async Task<bool> Odjava()
+    {
+        var response = await http.PostAsync("api/korisnik/odjava", null);
+        if (response.IsSuccessStatusCode)
+        {
+            await UkloniTokenIzLokalnogSkladista();
+            return true;
+        }
+        return false;
+    }
+
 }

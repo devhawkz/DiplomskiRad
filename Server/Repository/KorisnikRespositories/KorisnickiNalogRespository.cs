@@ -173,4 +173,15 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools
 
         return new PrijavaResponse(true, "Token je još uvek validan");
     }
+
+    public async Task<bool> Odjava(string accessToken)
+    {
+        var tokenInfo = await context.TokenInfo.FirstOrDefaultAsync(t => t.AccessToken == accessToken);
+        if (tokenInfo == null)
+            return false;
+
+        context.TokenInfo.Remove(tokenInfo);
+        await tools.Sacuvaj();
+        return true;
+    }
 }
