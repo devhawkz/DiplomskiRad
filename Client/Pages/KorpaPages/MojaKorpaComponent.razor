@@ -1,0 +1,168 @@
+﻿@page "/korpa/moja-korpa"
+
+@using Client.Pages.ProizvodPages;
+@implements IDisposable;
+
+@if (korpaService.isKorpaLoaderVidljiv)
+{
+    <LoadingPage />
+}
+
+else
+{
+    @if(MojaKorpaNarudzbine is not null)
+    {
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="card">
+                        <div class="card-header">Korpa</div>
+                        <div class="card-body p-5">
+                            <span>
+                                <sub style="font-size:30px; font-family:Impact;">$</sub>
+                                <sup style="font-size:20px;">@MojaKorpaNarudzbine.Sum(_ => _.UkupnaCena).ToString("#.##"))</sup>
+                            </span>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-lg btn-danger">
+                                <i class="fa fa-cart-arrow-down"></i>
+                                Nastavi sa plaćanjem
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <BanerComponent />
+                    <div class="card">
+                        <div class="card-header">Detalji</div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Slika</th>
+                                        <th scope="col">Naziv</th>
+                                        <th scope="col">Cena</th>
+                                        <th scope="col">Količina</th>
+                                        <th scope="col">Ukupno</th>
+                                        <th scope="col">Akcija</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (MojaKorpaNarudzbine is not null)
+                                    {
+                                        var lista = MojaKorpaNarudzbine.Skip(SkipVrednost).Take(TakeVrednost).ToList();
+                                        int brojac = 1;
+
+                                        foreach (var proizvod in lista)
+                                        {
+                                            <tr>
+                                                <td>@brojac</td>
+                                                <td><img src="@proizvod.Slika" width="100" height="150" /></td>
+                                                <td>@proizvod.Naziv</td>
+                                                <td>@proizvod.Cena</td>
+                                                <td><input type="number" min="1" class="form-control w-25" value="@proizvod.Kolicina" @onchange="@(e => UpravljajPromenom(e, proizvod))" /></td>
+                                                <td>@proizvod.UkupnaCena</td>
+                                                <td>
+                                                     <a id="changeCursor" @onclick="async () => await ObrisiProizvodIzKorpe(proizvod)">
+                                                        <i class="fa fa-trash text-danger"></i>
+                                                     </a>
+                                                </td>
+                                            </tr>
+                                            brojac++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-center">
+                            <SfPager @ref="@stranica" PageSize="3" NumericItemsCount="4" TotalItemsCount="MojaKorpaNarudzbine!.Count" ItemClick="Klik" />
+                        </div>
+                    </div>
+                </div>
+                <PreporuceniProizvodiComponent />
+            </div>
+        </div>
+    }
+
+    else
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <p role="alert" class="alert alert-info">Niste dodali nijedan proizvod u korpu!</p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+<MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
+
+@code
+{
+    SfPager? stranica;
+    public int SkipVrednost;
+    public int TakeVrednost = 3;
+
+    List<Narudzbina> MojaKorpaNarudzbine = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        MojaKorpaNarudzbine = await korpaService.MojeNarudzbine();
+        messageDialogService.Action += StateHasChanged;
+    }
+
+    async Task UpravljajPromenom(Microsoft.AspNetCore.Components.ChangeEventArgs e, Narudzbina narudzbina)
+    {
+        try
+        {
+            if (int.Parse(e.Value!.ToString()!) <= 0 || e.Value!.ToString()!.Equals("") || string.IsNullOrWhiteSpace(e.Value!.ToString())) return;
+
+            var getNarudzbinu = MojaKorpaNarudzbine.FirstOrDefault(_ => _.Id == narudzbina.Id);
+            getNarudzbinu!.Kolicina = int.Parse(e.Value!.ToString()!);
+
+            // azuriranje kolicine
+            PrikaziOdgovor(await korpaService.DodajUKorpu(new Proizvod()
+                {
+                    Id = narudzbina.Id
+                }, getNarudzbinu.Kolicina));
+
+        }
+        catch{}
+    }
+
+    async Task ObrisiProizvodIzKorpe(Narudzbina proizvod)
+    {
+        bool potvrda = await js.InvokeAsync<bool>("potvrdaBrisanja");
+        if (!potvrda) return;
+        MojaKorpaNarudzbine.Remove(MojaKorpaNarudzbine.FirstOrDefault(_ => _.Id == proizvod.Id)!);
+        PrikaziOdgovor(await korpaService.ObrisiProizvodIzKorpe(proizvod));
+
+    }
+
+    private void PrikaziOdgovor(ServiceResponse serviceResponse)
+    {
+        if (serviceResponse.Flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", serviceResponse.Poruka);
+
+        else
+            messageDialogService.messageDialog!.SetDialogValues("warning", serviceResponse.Poruka);
+
+        messageDialogService.SetMessageDialog();
+    }
+
+    public void Klik(PagerItemClickEventArgs args)
+    {
+        SkipVrednost = (args.CurrentPage * stranica!.PageSize) - stranica.PageSize;
+        TakeVrednost = stranica.PageSize;
+    }
+
+    public void Dispose()
+    {
+        messageDialogService.Action -= StateHasChanged;
+    }
+}

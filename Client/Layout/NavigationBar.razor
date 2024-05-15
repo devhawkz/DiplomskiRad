@@ -4,12 +4,14 @@
 @inject NavigationManager NavManager;
 @inject AuthenticationService AuthService;
 
+@implements IDisposable;
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" @onclick="IdiUKorpu" style="cursor:pointer;">
             <i class="fa fa-cart-shopping text-danger"></i>
-            <span class="small text-danger fw-bold">1</span>
+            <span class="small text-danger fw-bold">@korpaService.KorpaCount</span>
 
             <h6>
                 Pozdrav,
@@ -26,21 +28,12 @@
         <div class="collapse navbar-collapse fw-bold" id="navbarSupportedContent" style="margin-left:25vw">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="font-family:MojFont">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">POCETNA</a>
+                    <a class="nav-link active" aria-current="page"  style="margin-right:20px;" href="#">POCETNA</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="/proizvodi">PROIZVODI</a>
+                    <a class="nav-link d-flex align-items-center" style="margin-right:20px"; href=" /proizvodi">PROIZVODI</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="#">SERVISI</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">O NAMA</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">KONTAKT</a>
-                </li>
-
+                
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Nalog
@@ -96,6 +89,11 @@
     public bool PrikaziPretragu { get; set; }
     public bool PrikaziPretraguIkona { get; set; } = true;
 
+    protected async override Task OnInitializedAsync()
+    {
+        await korpaService.GetKorpaCount();
+        korpaService.KorpaAction += StateHasChanged;
+    }
 
     // metoda koja prikazuje polje za unos teksta za pretragu
     void PretragaKlik()
@@ -109,24 +107,21 @@
         NavManager.NavigateTo($"nalog/{url}");
     }
 
-    async Task OdjavaKorisnika()
+    private async Task OdjavaKorisnika()
     {
-        var uspesno = await AuthService.Odjava();
+        
+        var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await customAuthenticationService.UpdateAuthenticationState(null);
+        NavManager.NavigateTo("/", forceLoad: true);
+    }
 
-        if (uspesno)
-        {
-            messageDialogService.messageDialog!.SetDialogValues("success", "Uspešno ste se odjavili");
-            messageDialogService.SetMessageDialog();
+    void IdiUKorpu()
+    {
+        NavManager.NavigateTo("/korpa/moja-korpa");
+    }
 
-            NavManager.NavigateTo("/", forceLoad: true);
-
-        }
-        else
-        {
-            messageDialogService.messageDialog!.SetDialogValues("danger", "Došlo je do greške prilikom odjave");
-            messageDialogService.SetMessageDialog();
-
-            NavManager.NavigateTo("/", forceLoad: true);
-        }
+    public void Dispose()
+    {
+        korpaService.KorpaAction -= StateHasChanged;
     }
 }

@@ -1,4 +1,5 @@
 ﻿@implements IDisposable;
+@inject NavigationManager NavManager;
 
     <div class="container-fluid mt-5">
         <div class="row">
@@ -23,7 +24,7 @@
                                         {
                                             <span class="badge bg-none d-flex  align-items-end float-end" style="width:50px; height:20px;"></span>
                                         }
-                                        <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
+                                    <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" @onclick="() => PrikaziProizvod(proizvod)"/>
                                         <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@proizvod.Naziv</div>
                                     </div>
                                 </div>
@@ -98,6 +99,8 @@
         Skip += VelicinaStrane;
         DodajUPreporuceneProizvode(getSledeceProizvode);
     }
+
+    void PrikaziProizvod(Proizvod proizvod) => NavManager.NavigateTo($"/proizvodi/{proizvod.Id}");
 
     public void Dispose()
     {

@@ -1,4 +1,5 @@
 ﻿@implements IDisposable;
+@inject NavigationManager NavManager;
 
 @if(proizvodService.IsVisible)
 {
@@ -24,7 +25,7 @@ else
 
                                         <!--Deo za sliku-->
                                         <figure class="img-container">
-                                            <img src="@proizvod.Base64Img" width="250" height="380" class="float-end" style="cursor:pointer" />
+                                            <img src="@proizvod.Base64Img" width="250" height="380" class="float-end" style="cursor:pointer" @onclick="() => PrikaziProizvod(proizvod)"/>
                                         </figure>
 
                                         <!--Deo za naziv, opis, kolicinu-->
@@ -33,7 +34,7 @@ else
                                                 <div class="vstack gap-3 mb-3">
                                                     <div>
                                                         <p>
-                                                            <span style="font-family:impact; text-indent:2px; cursor:pointer" class="text-dark fw-bold display-2">
+                                                            <span style="font-family:impact; text-indent:2px; cursor:pointer" class="text-dark fw-bold display-2" @onclick="() => PrikaziProizvod(proizvod)">
                                                                 @proizvod.Naziv
                                                                 <sup style="font-family:'Courier New'">
 
@@ -62,11 +63,11 @@ else
 
                                                 <!--Deo za dugmice-->
                                                 <div class="hstack gap-1 d-flex justify-content-center">
-                                                    <button class="btn btn-secondary fw-bold" id="styleButton">
+                                                    <button class="btn btn-secondary fw-bold" id="styleButton" @onclick="() => PrikaziProizvod(proizvod)">
                                                         <i class="fa fa-list"></i> Detalji
                                                     </button>
 
-                                                    <button class="btn btn-outline-danger fw-bold" id="styleButton">
+                                                    <button class="btn btn-outline-danger fw-bold" id="styleButton" @onclick="() => DodajUKorpu(proizvod)">
                                                         <i class="fa fa-cart-plus "></i> KUPI ODMAH
                                                     </button>
                                                 </div>
@@ -107,7 +108,7 @@ else
     </div>
 }
 
-
+<MessageDialog @ref="messageDialogService.messageDialog" />
 
 @code {
 
@@ -116,12 +117,30 @@ else
         bool preporuceniProizvod = true;
         await proizvodService.GetProizvode(preporuceniProizvod);
         proizvodService.ProizvodAction += StateHasChanged;
+        messageDialogService.Action += StateHasChanged;
     }
 
-    
+
+    private async Task DodajUKorpu(Proizvod model)
+    {
+        var (flag, poruka) = await korpaService.DodajUKorpu(model);
+
+        if (flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+
+        else
+            messageDialogService.messageDialog!.SetDialogValues("info", poruka);
+
+        messageDialogService.SetMessageDialog();
+
+
+    }
+
+    void PrikaziProizvod(Proizvod proizvod) => NavManager.NavigateTo($"/proizvodi/{proizvod.Id}");
 
     public void Dispose()
     {
         proizvodService.ProizvodAction -= StateHasChanged;
+        messageDialogService.Action += StateHasChanged;
     }
 }

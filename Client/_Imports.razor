@@ -17,7 +17,7 @@
 @using Client.Pages.KategorijaPages;
 @using Client.Services.ToolsService;
 @using Client.Services.KorisnikServices;
-
+@using Client.Services.KorpaServices;
 
 @using SharedLibrary.Models;
 @using SharedLibrary.Responses;
@@ -26,10 +26,10 @@
 @using Syncfusion.Blazor.Navigations;
 
 
-
 @inject MessageDialogService messageDialogService
 @inject IProizvodService proizvodService;
 @inject IKategorijaService kategorijaService;
+@inject IKorpa korpaService;
 @inject IToolsService toolsService;
 @inject IJSRuntime js;
 @inject IKorisnikService nalogService;

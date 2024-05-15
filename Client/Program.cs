@@ -1,5 +1,7 @@
 global using SharedLibrary.Models;
 global using SharedLibrary.Responses;
+global using Client.Models;
+
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
@@ -11,6 +13,7 @@ using Client.Services.KorisnikServices;
 using Client.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
+using Client.Services.KorpaServices;
 
 namespace Client;
 
@@ -26,11 +29,12 @@ public class Program
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-        builder.Services.AddScoped<IProizvodService, ClientServices>();
+        builder.Services.AddScoped<IProizvodService, ProizvodService>();
         builder.Services.AddSingleton<IToolsService, Tools>();
-        builder.Services.AddScoped<IKategorijaService, ClientServices>();
+        builder.Services.AddScoped<IKategorijaService, KategorijaService>();
         builder.Services.AddScoped<IKorisnikService, KorisnikService>();
-        
+        builder.Services.AddScoped<IKorpa, KorpaService>();
+
         builder.Services.AddScoped<AuthenticationService>();
         builder.Services.AddScoped<MessageDialogService>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

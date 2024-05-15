@@ -20,7 +20,7 @@
                                     <p class="text-muted fs-6" style="font-family:Tahoma">@(toolsService.GetOpis(banner1.Opis!))</p>
                                     <h6 class="text-muted">Moguća dostava na kućnu adresu</h6>
                                     <h5 class="text-danger">@banner1.Cena.ToString("$#.##")</h5>
-                                    <button class="btn btn-danger">
+                                    <button class="btn btn-danger" @onclick="() => DodajUKorpu(banner1)">
                                         KUPI ODMAH <i class="fa fa-cart-shopping"></i>
                                     </button>
                                 </div>
@@ -40,7 +40,7 @@
                                     <p class="text-muted fs-6" style="font-family:Tahoma">@(toolsService.GetOpis(banner2.Opis!))</p>
                                     <h6 class="text-muted">Moguća dostava na kućnu adresu</h6>
                                     <h5 class="text-danger">@banner2.Cena.ToString("$#.##")</h5>
-                                    <button class="btn btn-danger">
+                                    <button class="btn btn-danger" @onclick="() => DodajUKorpu(banner2)">
                                         KUPI ODMAH <i class="fa fa-cart-shopping"></i>
                                     </button>
                                 </div>
@@ -54,6 +54,8 @@
     </div>
 }
 
+
+
 @code {
 
 
@@ -62,10 +64,23 @@
         bool preporucen = true;
         await proizvodService.GetProizvode(preporucen);
         proizvodService.ProizvodAction += StateHasChanged;
+        messageDialogService.Action += StateHasChanged;
     }
 
+    async Task DodajUKorpu(Proizvod proizvod) => PrikaziOdgovor(await korpaService.DodajUKorpu(proizvod));
+
+    private void PrikaziOdgovor(ServiceResponse serviceResponse)
+    {
+        if (serviceResponse.Flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", serviceResponse.Poruka);
+        else
+            messageDialogService.messageDialog!.SetDialogValues("warning", serviceResponse.Poruka);
+
+        messageDialogService.SetMessageDialog();
+    }
     public void Dispose()
     {
         proizvodService.ProizvodAction -= StateHasChanged;
+        messageDialogService.Action -= StateHasChanged;
     }
 }

@@ -1,0 +1,86 @@
+﻿@implements IDisposable;
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">Detalji proizvoda</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <img src="@Proizvod!.Base64Img" width="150" height="250" />
+                        <div class="card-body">
+                            <p>
+                                <div class="vstack gap-2">
+                                    <h3>@Proizvod.Naziv</h3>
+                                    <div class="hstack gap-2">
+                                        <span>Kategorija: </span>
+                                        <span>
+                                            @if(Proizvod is not null)
+                                            {
+                                                <span>@Proizvod.Kategorija!.Naziv</span>
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="hstack gap-2">
+                                        <span>Količina:</span>
+                                        <span>@Proizvod.Kolicina</span>
+                                    </div>
+                                    <div class="hstack gap-2">
+                                        <span>Opis:</span>
+                                        <span>@Proizvod.Opis</span>
+                                    </div>
+                                    <div class="hstack gap-2">
+                                        <span>Cena:</span>
+                                        <span class="text-danger">@Proizvod.Cena.ToString("#.##")</span>
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-info" @onclick="KlikUnazad"><i class="fa fa-angle-left"></i>Nazad</button>
+                    <button class="btn btn-danger" style="margin-left:20px;" @onclick="DodajUKorpu"><i class="fa fa-cart-shopping"></i>Dodaj u korpu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<MessageDialog @ref="messageDialogService.messageDialog" />
+@code {
+    [Parameter] public Proizvod Proizvod { get; set; }
+
+    // obavestava parent komponentu cim se nesto desi u child komponenti
+    [Parameter] public EventCallback HandleBackClickedEvent { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        messageDialogService.Action += StateHasChanged;
+    }
+
+    async Task KlikUnazad()
+    {
+        await HandleBackClickedEvent.InvokeAsync();
+    }
+
+    async Task DodajUKorpu()
+    {
+        if (Proizvod is null) return;
+        PrikaziOdgovor(await korpaService.DodajUKorpu(Proizvod!));
+    }
+
+    private void PrikaziOdgovor(ServiceResponse serviceResponse)
+    {
+        if (serviceResponse.Flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", serviceResponse.Poruka);
+        else
+            messageDialogService.messageDialog!.SetDialogValues("warning", serviceResponse.Poruka);
+
+        messageDialogService.SetMessageDialog();
+    }
+
+    public void Dispose()
+    {
+        messageDialogService.Action -= StateHasChanged;
+    }
+}

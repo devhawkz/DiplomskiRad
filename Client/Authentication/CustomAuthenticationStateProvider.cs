@@ -33,12 +33,12 @@ public class CustomAuthenticationStateProvider(AuthenticationService authenticat
         ClaimsPrincipal claimsPrincipal = new();
 
         //prijava
-        if (tokenProp is not null || !string.IsNullOrEmpty(tokenProp!.Token))
+        if (tokenProp is not null && !string.IsNullOrEmpty(tokenProp!.Token))
         {
             await authenticationService.SetTokenULokalnoSkladiste(tools.SerializeObj(tokenProp));
             var getSesijuKorisnika = await authenticationService.GetDetaljeKorisnika();
 
-            if (getSesijuKorisnika is not null || !string.IsNullOrEmpty(getSesijuKorisnika!.Email))
+            if (getSesijuKorisnika is not null && !string.IsNullOrEmpty(getSesijuKorisnika!.Email))
                 claimsPrincipal = authenticationService.SetClaimPrincipal(getSesijuKorisnika);
         }
 

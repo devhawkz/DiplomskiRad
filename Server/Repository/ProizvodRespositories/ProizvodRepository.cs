@@ -33,9 +33,14 @@ public class ProizvodRepository(DataContext context, ITools tools) : IProizvod
     {
         // _ je placeholder, nema potrebe za eksplicitnim imenovanjem promenljive ili parametra
         if (preporuceniProizvod)
-            return await context.Proizvodi.Where(p => p.PreporucenProizvod).ToListAsync();
+            return await context.Proizvodi
+                .Where(p => p.PreporucenProizvod)
+                .Include(_ => _.Kategorija)
+                .ToListAsync();
         else
-            return await context.Proizvodi.ToListAsync();
+            return await context.Proizvodi
+                .Include(_ => _.Kategorija)
+                .ToListAsync();
     }
 
 }

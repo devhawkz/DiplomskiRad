@@ -1,4 +1,5 @@
 ﻿@implements IDisposable;
+@inject NavigationManager NavManager;
 
 @if(proizvodService.PreporuceniProizvodi is not null)
 {
@@ -14,12 +15,12 @@
                                     <div class="row">
                                         @foreach(var product in itemDictionary.Value)
                                         {
-                                            <div class="col-lg-2 card-container-display">
+                                            <div class="col-lg-2 card-container-display" @onclick="() => PrikaziProizvod(product)">
                                                 <div class="card border-success shadow">
                                                     <div class="card-body d-flex justify-content-between">
-                                                        <img src="@product.Base64Img" width="100" height="150" class="d-flex justify-content-center" style="margin-right: 5px;"/>
+                                                        <img src="@product.Base64Img" width="100" height="150" class="d-flex justify-content-center" style="margin-right: 5px;" />
                                                         <div class="vstack gap-1">
-                                                            <h5>@product.Naziv</h5>
+                                                            <h5 @onclick="() => PrikaziProizvod(product)">@product.Naziv</h5>
                                                             <h6>@(toolsService.GetOpis(product.Opis!))</h6>
                                                             <h6 class="text-danger">@product.Cena</h6>
                                                         </div>
@@ -93,5 +94,5 @@
         }
     }
 
-    
+    void PrikaziProizvod(Proizvod proizvod) => NavManager.NavigateTo($"/proizvodi/{proizvod.Id}");
 }

@@ -1,4 +1,7 @@
 ﻿@page "/proizvodi"
+@page "/proizvodi/{id:int}"
+@page "/proizvodi/pretraga/{filter}"
+
 @implements IDisposable;
 
 @if(proizvodService.IsVisible)
@@ -15,9 +18,18 @@ else
             </div>
             <div class="col-lg-10">
                <BanerComponent />
-                <div class="card border-0 mt-4">
-                    <!--Prosledjujemo listu svih proizvoda komponenti ListaProizvodaComponent, koristi se desni izraz samo kada je levi izraz null (desni izraz = proizvodService.SviProizvodi )-->
-                    <ListaProizvodaComponent SviProizvodi="proizvodService.ProizvodiIsteKategorije??proizvodService.SviProizvodi" />
+                <div class="card border-0">
+                    <div class="card-header border-success-subtle mb-2"></div>
+                    @if(PrikaziListuProizvoda)
+                    {
+                        <!--Prosledjujemo listu svih proizvoda komponenti ListaProizvodaComponent, koristi se desni izraz samo kada je levi izraz null (desni izraz = proizvodService.SviProizvodi )-->
+                        <ListaProizvodaComponent SviProizvodi="ListaProizvodaInterna ?? proizvodService.ProizvodiIsteKategorije ?? proizvodService.SviProizvodi" HandleProductDetailsEvent="HandleProductDetailsEvent" />
+                    }
+                    
+                    @if(PrikaziDetaljeProizvoda)
+                    {
+                        <DetaljiProizvodaComponent HandleBackClickedEvent="HandleBackClickedEvent" Proizvod="DetaljiProizvoda" />
+                    }
                 </div>
             </div>
             <div class="col-lg-12 mt-5">
@@ -32,6 +44,15 @@ else
 
 @code
 {
+    [Parameter] public int Id { get; set; } = 0;
+
+    [Parameter] public string Filter { get; set; } = string.Empty;
+    public bool PrikaziListuProizvoda { get; set; } = true;
+    public bool PrikaziDetaljeProizvoda { get; set; } = false;
+
+    public Proizvod DetaljiProizvoda { get; set; } = new();
+    public List<Proizvod> ListaProizvodaInterna { get; set; } = new();
+
     protected async override Task OnInitializedAsync()
     {
         await UcitajPodatke();
@@ -41,13 +62,15 @@ else
     private async void KategorijaKlikEvent(int kategorijaId)
     {
         if (kategorijaId == 0) return;
+
+        ListaProizvodaInterna?.Clear();
         await proizvodService.GetProizvodeIsteKategorije(kategorijaId);
     }
 
     private async void OsnovnaKategorijaKlik()
     {
         proizvodService.ProizvodiIsteKategorije = null!;
-       
+
         // uzima se lista sa servera, zato sto se ta lista moze cesto menjati i moze biti velika, te je bolje uzimati direktno sa servera, a ne iz memorije pregledaca -- detaljnije u svesci
         await UcitajPodatke();
     }
@@ -56,6 +79,33 @@ else
     {
         bool preporuceno = false;
         await proizvodService.GetProizvode(preporuceno);
+        ListaProizvodaInterna = proizvodService.SviProizvodi;
+    }
+
+    void HandleBackClickedEvent()
+    {
+        PrikaziDetaljeProizvoda = false;
+        PrikaziListuProizvoda = !PrikaziDetaljeProizvoda;
+    }
+
+    void HandleProductDetailsEvent(Proizvod prikaziProizvod)
+    {
+        DetaljiProizvoda = prikaziProizvod;
+        PrikaziDetaljeProizvoda = true;
+        PrikaziListuProizvoda = !PrikaziDetaljeProizvoda;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(Id > 0)
+        {
+            DetaljiProizvoda = proizvodService.SviProizvodi.FirstOrDefault(_ => _.Id == Id)!;
+            PrikaziDetaljeProizvoda = true;
+            PrikaziListuProizvoda = !PrikaziListuProizvoda;
+        }
+
+        if (!string.IsNullOrEmpty(Filter) || !string.IsNullOrWhiteSpace(Filter))
+            ListaProizvodaInterna = proizvodService.SviProizvodi.Where(_ => _.Naziv!.Contains(Filter, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     public void Dispose()
