@@ -14,6 +14,7 @@ using Client.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 using Client.Services.KorpaServices;
+using Client.Services.NaplataServices;
 
 namespace Client;
 
@@ -38,6 +39,7 @@ public class Program
         builder.Services.AddScoped<AuthenticationService>();
         builder.Services.AddScoped<MessageDialogService>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+        builder.Services.AddScoped<INaplata, NaplataService>();
         builder.Services.AddAuthorizationCore();
 
         builder.Services.AddSyncfusionBlazor();

@@ -4,6 +4,7 @@ using Server.Repository.KategorijaResposities;
 using Server.Repository.KorisnikRespositories;
 using Server.Repository.ProizvodRespositories;
 using Server.Repository.Tools;
+using Server.Repository.NaplataRespositories;
 
 
 namespace Server;
@@ -33,6 +34,7 @@ public class Program
         builder.Services.AddScoped<ITools, ToolsRespository>();
         builder.Services.AddScoped<IKategorija, KategorijaRespository>();
         builder.Services.AddScoped<IKorisnickiNalog, KorisnickiNalogRespository>();
+        builder.Services.AddScoped<INaplata, NaplataRespository>();
         //builder.Services.AddAuthorizationCore();
 
 

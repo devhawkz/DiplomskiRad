@@ -10,14 +10,15 @@
 
 @using Client
 @using Client.Layout;
+@using Client.Pages.Shared;
 @using Client.Services.ProizvodServices;
 @using Client.Services.KategorijaServices;
-@using Client.Pages.Shared;
-@using Client.Services.DialogServices;
 @using Client.Pages.KategorijaPages;
 @using Client.Services.ToolsService;
+@using Client.Services.DialogServices;
 @using Client.Services.KorisnikServices;
 @using Client.Services.KorpaServices;
+@using Client.Services.NaplataServices;
 
 @using SharedLibrary.Models;
 @using SharedLibrary.Responses;
@@ -34,3 +35,4 @@
 @inject IJSRuntime js;
 @inject IKorisnikService nalogService;
 @inject AuthenticationStateProvider AuthStateProvider;
+@inject INaplata naplataService;
