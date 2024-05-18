@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Server.Data;
+using Server.Repository.EmailRespository;
 using Server.Repository.Tools;
 using SharedLibrary.DTOs;
 using SharedLibrary.Responses;
@@ -7,8 +8,7 @@ using System.Text;
 
 namespace Server.Repository.KorisnikRespositories;
 
-public class KorisnickiNalogRespository(DataContext context, ITools tools
-    ) : IKorisnickiNalog
+public class KorisnickiNalogRespository(DataContext context, ITools tools, IEmail emailService) : IKorisnickiNalog
 { 
     public async Task<PrijavaResponse> Prijava(PrijavaDTO model)
     {
@@ -119,6 +119,8 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools
             });
             await tools.Sacuvaj();
         }
+
+        await emailService.SendEmailAsync(model.Email!, "Registracija Uspešna", "Vaša registracija je uspešno završena.");
 
         return new ServiceResponse(true, "Nalog je uspešno kreiran!");
 

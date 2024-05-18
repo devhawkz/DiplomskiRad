@@ -5,6 +5,7 @@ using Server.Repository.KorisnikRespositories;
 using Server.Repository.ProizvodRespositories;
 using Server.Repository.Tools;
 using Server.Repository.NaplataRespositories;
+using Server.Repository.EmailRespository;
 
 
 namespace Server;
@@ -35,6 +36,8 @@ public class Program
         builder.Services.AddScoped<IKategorija, KategorijaRespository>();
         builder.Services.AddScoped<IKorisnickiNalog, KorisnickiNalogRespository>();
         builder.Services.AddScoped<INaplata, NaplataRespository>();
+        builder.Services.AddTransient<IEmail, EmailService>();
+
         //builder.Services.AddAuthorizationCore();
 
 
