@@ -1,6 +1,6 @@
 ﻿@implements IDisposable;
 @inject NavigationManager NavManager;
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @if(proizvodService.IsVisible)
 {
     <LoadingPage/>
@@ -123,17 +123,29 @@ else
 
     private async Task DodajUKorpu(Proizvod model)
     {
-        var (flag, poruka) = await korpaService.DodajUKorpu(model);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        if (flag)
-            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
-
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            PrikaziOdgovor(await korpaService.DodajUKorpu(model));
+        }
         else
-            messageDialogService.messageDialog!.SetDialogValues("info", poruka);
+        {
+            NavManager.NavigateTo("/nalog/prijava"); // Preusmeravanje na stranicu za prijavu
+        }
+
+
+    }
+
+    private void PrikaziOdgovor(ServiceResponse serviceResponse)
+    {
+        if (serviceResponse.Flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", serviceResponse.Poruka);
+        else
+            messageDialogService.messageDialog!.SetDialogValues("warning", serviceResponse.Poruka);
 
         messageDialogService.SetMessageDialog();
-
-
     }
 
     void PrikaziProizvod(Proizvod proizvod) => NavManager.NavigateTo($"/proizvodi/{proizvod.Id}");
