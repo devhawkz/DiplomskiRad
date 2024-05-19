@@ -12,7 +12,7 @@ using Server.Data;
 namespace Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240429110246_prva")]
+    [Migration("20240519100539_prva")]
     partial class prva
     {
         /// <inheritdoc />

@@ -17,7 +17,7 @@ namespace Server.Controllers
             return Ok(kategorije);
         }
 
-        
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<ActionResult<ServiceResponse>> DodajKategoriju(Kategorija kategorijaModel)
         {

@@ -10,13 +10,13 @@ namespace Server.Controllers;
 [ApiController]
 public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
 {
-    [HttpPost("registracija")]
-    public async Task<ActionResult<ServiceResponse>> Registracija(KorisnikDTO model)
+    [HttpPost("registracija-korisnika")]
+    public async Task<ActionResult<ServiceResponse>> RegistracijaKorisnika(KorisnikDTO model)
     {
         if (model is null)
             return BadRequest("Morate uneti sve podatke!");
 
-        var odgovor = await nalogService.Registracija(model);
+        var odgovor = await nalogService.RegistracijaKorisnika(model);
 
         if (!odgovor.Flag)
             return Ok(odgovor);
@@ -36,6 +36,35 @@ public class KorisnikController(IKorisnickiNalog nalogService) : ControllerBase
         else
             return Ok(new PrijavaResponse(false, "Prijava nije uspela nakon registracije!", null, null));
         
+
+    }
+
+    [HttpPost("registracija-admina")]
+    public async Task<ActionResult<ServiceResponse>> RegistracijaAdmina(KorisnikDTO model)
+    {
+        if (model is null)
+            return BadRequest("Morate uneti sve podatke!");
+
+        var odgovor = await nalogService.RegistracijaAdmina(model);
+
+        if (!odgovor.Flag)
+            return Ok(odgovor);
+
+        // auto. prijava nakon registacije korisnika
+        PrijavaDTO prijavaModel = new PrijavaDTO()
+        {
+            Email = model.Email,
+            Lozinka = model.Lozinka
+        };
+
+        var prijavaRezultat = await nalogService.Prijava(prijavaModel);
+
+        if (prijavaRezultat.Flag)
+            return Ok(new PrijavaResponse(true, "Uspešna registracija i prijava!", prijavaRezultat.Token, prijavaRezultat.RefreshToken));
+
+        else
+            return Ok(new PrijavaResponse(false, "Prijava nije uspela nakon registracije!", null, null));
+
 
     }
 

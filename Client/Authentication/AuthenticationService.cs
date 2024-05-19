@@ -63,7 +63,7 @@ public class AuthenticationService(HttpClient http, ILocalStorageService lokalno
     public async Task<HttpClient> AddZaglavljeToHttpClient()
     {
         http.DefaultRequestHeaders.Remove("Authorization");
-        
+
         // dodaje se access token u zaglavlje
         http.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", tools.DeserializeJsonString<TokenProp>(await GetTokenIzLokalnogSkladista()).Token);

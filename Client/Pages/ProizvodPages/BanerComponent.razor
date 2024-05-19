@@ -1,6 +1,9 @@
-﻿@implements IDisposable;
+﻿@using Client.Pages.ProizvodPages
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@implements IDisposable
 
-@if(proizvodService.PreporuceniProizvodi is not null)
+@if (proizvodService.PreporuceniProizvodi is not null)
 {
     <div class="container-fluid">
         @{
@@ -54,11 +57,7 @@
     </div>
 }
 
-
-
 @code {
-
-
     protected async override Task OnInitializedAsync()
     {
         bool preporucen = true;
@@ -67,7 +66,20 @@
         messageDialogService.Action += StateHasChanged;
     }
 
-    async Task DodajUKorpu(Proizvod proizvod) => PrikaziOdgovor(await korpaService.DodajUKorpu(proizvod));
+    async Task DodajUKorpu(Proizvod proizvod)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            PrikaziOdgovor(await korpaService.DodajUKorpu(proizvod));
+        }
+        else
+        {
+            NavManager.NavigateTo("/nalog/prijava"); // Preusmeravanje na stranicu za prijavu
+        }
+    }
 
     private void PrikaziOdgovor(ServiceResponse serviceResponse)
     {
@@ -78,6 +90,7 @@
 
         messageDialogService.SetMessageDialog();
     }
+
     public void Dispose()
     {
         proizvodService.ProizvodAction -= StateHasChanged;

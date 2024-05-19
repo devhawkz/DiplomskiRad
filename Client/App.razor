@@ -1,7 +1,39 @@
 ﻿<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />   
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+                <NotAuthorized>
+                    @if (!context.User.Identity!.IsAuthenticated)
+                    {
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p role="alert" class="alert alert-warning">Morate biti prijavljeni da biste pristupili ovoj stranici..</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p role="alert" class="alert alert-warning">Nemate dozvolu za pristup ovoj stranici.</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p role="alert" class="alert alert-warning">Autorizacija u toku...</p>
+                            </div>
+                        </div>
+                    </div>
+                </Authorizing>
+            </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>

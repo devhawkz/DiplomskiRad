@@ -19,12 +19,27 @@ public class KorisnikService(HttpClient http, IToolsService tools) : IKorisnikSe
         return tools.DeserializeJsonString<PrijavaResponse>(apiResponse);
     }
 
-    public async Task<ServiceResponse> Registracija(KorisnikDTO model)
+    public async Task<ServiceResponse> RegistracijaKorisnika(KorisnikDTO model)
     {
-        var response = await http.PostAsync($"{_baseUrl}/registracija", tools.GenerateStringContent(tools.SerializeObj(model)));
+        var response = await http.PostAsync($"{_baseUrl}/registracija-korisnika", tools.GenerateStringContent(tools.SerializeObj(model)));
         var rezultat = CheckResponse(response);
 
         if(!rezultat.Flag)
+            return rezultat;
+
+        // prevodi odgovor iz HttpResponseMessage u string(i dalje je JSON string)
+        var apiResponse = await ReadContent(response);
+
+        // prevodi JSON string u objekat tipa ServiceResponse
+        return tools.DeserializeJsonString<ServiceResponse>(apiResponse);
+    }
+
+    public async Task<ServiceResponse> RegistracijaAdmina(KorisnikDTO model)
+    {
+        var response = await http.PostAsync($"{_baseUrl}/registracija-admina", tools.GenerateStringContent(tools.SerializeObj(model)));
+        var rezultat = CheckResponse(response);
+
+        if (!rezultat.Flag)
             return rezultat;
 
         // prevodi odgovor iz HttpResponseMessage u string(i dalje je JSON string)

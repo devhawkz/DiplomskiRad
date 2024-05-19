@@ -56,7 +56,7 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools, IEmai
         }
     }
 
-    public async Task<ServiceResponse> Registracija(KorisnikDTO model)
+    private async Task<ServiceResponse> IspravnostPodataka(KorisnikDTO model)
     {
         if (model is null)
             return new ServiceResponse(false, "Morate uneti sve podatke!");
@@ -65,42 +65,35 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools, IEmai
         if (pronadji is not null)
             return new ServiceResponse(false, "Korisnik sa tim imejlom već postoji");
 
-        var korisnik = context.KorisnickiNalozi.Add(new KorisnickiNalog()
-        {
-            Ime = model.Ime,
-            Email = model.Email,
-            Lozinka = BCrypt.Net.BCrypt.HashPassword(model.Lozinka)
-        }).Entity;
+        return new ServiceResponse(true, "Svi uneti podaci su ispravni");
 
-        await tools.Sacuvaj();
+    }
 
-        // dodeljivanje uloge
-        var proveraAdmina = await context.Uloge.FirstOrDefaultAsync(_ => _.Naziv!.ToLower().Equals("admin"));
-        
-        if(proveraAdmina is null)
-        {
-            var rezultat = context.Uloge.Add(new Uloga()
-            {
-                Naziv = "Admin"
-            }).Entity;
 
-            await tools.Sacuvaj();
+    public async Task<ServiceResponse> RegistracijaKorisnika(KorisnikDTO model)
+    {
 
-            // povezujemo korisnika sa ulogom
-            context.KorisnickeUloge.Add(new KorisnickaUloga() 
-            {
-                UlogaId = rezultat.Id,
-                KorisnickiNalogId  = korisnik.Id
-            });
-            await tools.Sacuvaj();
-        }
+        var ispravniPodaci = await IspravnostPodataka(model);
+
+        if (!ispravniPodaci.Flag)
+            return new ServiceResponse(false, ispravniPodaci.Poruka);
 
         else
         {
+            var korisnik = context.KorisnickiNalozi.Add(new KorisnickiNalog()
+            {
+                Ime = model.Ime,
+                Email = model.Email,
+                Lozinka = BCrypt.Net.BCrypt.HashPassword(model.Lozinka)
+            }).Entity;
+
+            await tools.Sacuvaj();
+            
+            // dodeljivanje uloge
             var proveraKorisnika = await context.Uloge.FirstOrDefaultAsync(_ => _.Naziv!.ToLower().Equals("korisnik"));
             int UlogaID = 0;
 
-            if(proveraKorisnika is null)
+            if (proveraKorisnika is null)
             {
                 var korisnikRezultat = context.Uloge.Add(new Uloga()
                 {
@@ -112,17 +105,70 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools, IEmai
 
             }
 
-            context.KorisnickeUloge.Add(new KorisnickaUloga() 
+            context.KorisnickeUloge.Add(new KorisnickaUloga()
             {
                 UlogaId = UlogaID == 0 ? proveraKorisnika!.Id : UlogaID,
-                 KorisnickiNalogId  = korisnik.Id
+                KorisnickiNalogId = korisnik.Id
             });
             await tools.Sacuvaj();
+
+
+            await emailService.SendEmailAsync(model.Email!, "Registracija Uspešna", "Vaša registracija je uspešno završena.");
+
+            return new ServiceResponse(true, "Nalog je uspešno kreiran!");
+        }
+       
+
+    }
+
+    public async Task<ServiceResponse> RegistracijaAdmina(KorisnikDTO model)
+    {
+
+        var ispravniPodaci = await IspravnostPodataka(model);
+
+        if (!ispravniPodaci.Flag)
+            return new ServiceResponse(false, ispravniPodaci.Poruka);
+
+        else
+        {
+            var korisnik = context.KorisnickiNalozi.Add(new KorisnickiNalog()
+            {
+                Ime = model.Ime,
+                Email = model.Email,
+                Lozinka = BCrypt.Net.BCrypt.HashPassword(model.Lozinka)
+            }).Entity;
+
+            await tools.Sacuvaj();
+
+            // dodeljivanje uloge
+            var proveraAdmina = await context.Uloge.FirstOrDefaultAsync(_ => _.Naziv!.ToLower().Equals("Admin"));
+            int UlogaID = 0;
+
+            if (proveraAdmina is null)
+            {
+                var adminRezultat = context.Uloge.Add(new Uloga()
+                {
+                    Naziv = "Admin"
+                }).Entity;
+
+                await tools.Sacuvaj();
+                UlogaID = adminRezultat.Id;
+
+            }
+
+            context.KorisnickeUloge.Add(new KorisnickaUloga()
+            {
+                UlogaId = UlogaID == 0 ? proveraAdmina!.Id : UlogaID,
+                KorisnickiNalogId = korisnik.Id
+            });
+            await tools.Sacuvaj();
+
+
+            await emailService.SendEmailAsync(model.Email!, "Registracija Uspešna", "Vaša registracija je uspešno završena.");
+
+            return new ServiceResponse(true, "Nalog je uspešno kreiran!");
         }
 
-        await emailService.SendEmailAsync(model.Email!, "Registracija Uspešna", "Vaša registracija je uspešno završena.");
-
-        return new ServiceResponse(true, "Nalog je uspešno kreiran!");
 
     }
 

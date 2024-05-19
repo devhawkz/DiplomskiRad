@@ -5,7 +5,8 @@ namespace Server.Repository.KorisnikRespositories;
 
 public interface IKorisnickiNalog
 {
-    Task<ServiceResponse> Registracija(KorisnikDTO model);
+    Task<ServiceResponse> RegistracijaKorisnika(KorisnikDTO model);
+    Task<ServiceResponse> RegistracijaAdmina(KorisnikDTO model);
     Task<PrijavaResponse> Prijava(PrijavaDTO model);
     Task<SesijaKorisnika> GetKorisnikaPoTokenu(string token);
     Task<PrijavaResponse> GetRefreshToken(PostRefreshTokenDTO model);

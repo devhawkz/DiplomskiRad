@@ -48,7 +48,7 @@
                         
                             <NotAuthorized>
                                 @{
-                                    string registracija = "registracija";
+                                    string registracija = "registracija-korisnika";
                                     string prijava = "prijava";
                                 }
 
@@ -109,7 +109,11 @@
 
     private async Task OdjavaKorisnika()
     {
-        
+        var lista = await korpaService.MojeNarudzbine();
+        if(lista is not null && lista.Count > 0)
+            foreach (var stavka in lista)
+                await korpaService.ObrisiProizvodIzKorpe(stavka);
+
         var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
         await customAuthenticationService.UpdateAuthenticationState(null);
         NavManager.NavigateTo("/", forceLoad: true);

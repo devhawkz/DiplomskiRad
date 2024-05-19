@@ -1,4 +1,4 @@
-﻿@page "/nalog/registracija-korisnika"
+﻿@page "/nalog/registracija-admina"
 
 @using Client.Authentication
 @using Microsoft.AspNetCore.Components.Authorization
@@ -60,17 +60,17 @@
     {
         messageDialogService.PrikaziDugmeSacuvaj = false;
         messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
-        var (flag, poruka) = await nalogService.RegistracijaKorisnika(korisnik);
+        var (flag, poruka) = await nalogService.RegistracijaAdmina(korisnik);
 
-        if(flag)
+        if (flag)
         {
             var prijavaResponse = await nalogService.Prijava(new PrijavaDTO()
-            {
-                Email = korisnik.Email,
-                Lozinka = korisnik.Lozinka
-            });
+                {
+                    Email = korisnik.Email,
+                    Lozinka = korisnik.Lozinka
+                });
 
-            if(prijavaResponse.Flag)
+            if (prijavaResponse.Flag)
             {
                 var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
                 await customAuthStateProvider.UpdateAuthenticationState(new TokenProp() { Token = prijavaResponse.Token, RefreshToken = prijavaResponse.RefreshToken });
@@ -94,3 +94,4 @@
     public void Dispose() => messageDialogService.Action -= StateHasChanged;
 
 }
+

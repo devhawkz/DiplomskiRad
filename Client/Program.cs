@@ -40,6 +40,7 @@ public class Program
         builder.Services.AddScoped<MessageDialogService>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
         builder.Services.AddScoped<INaplata, NaplataService>();
+
         builder.Services.AddAuthorizationCore();
 
         builder.Services.AddSyncfusionBlazor();

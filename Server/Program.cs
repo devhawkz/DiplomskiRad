@@ -6,6 +6,8 @@ using Server.Repository.ProizvodRespositories;
 using Server.Repository.Tools;
 using Server.Repository.NaplataRespositories;
 using Server.Repository.EmailRespository;
+using Microsoft.AspNetCore.Authentication;
+using Server.AuthHandler;
 
 
 namespace Server;
@@ -29,6 +31,16 @@ public class Program
         builder.Services.AddDbContext<DataContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("Konekcioni string nije pronadjen"));
+        });
+
+        // konfig autorizacije i autentfikacije
+        builder.Services.AddAuthentication("CustomScheme")
+            .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>("CustomScheme", null);
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("UserOnly", policy => policy.RequireRole("Korisnik"));
         });
 
         builder.Services.AddScoped<IProizvod, ProizvodRepository>();
@@ -57,7 +69,7 @@ public class Program
         app.UseBlazorFrameworkFiles();
         app.UseStaticFiles();
 
-
+        app.UseAuthentication();
         app.UseAuthorization();
         
         app.MapRazorPages();

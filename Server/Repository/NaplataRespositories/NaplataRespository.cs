@@ -45,6 +45,9 @@ public class NaplataRespository : INaplata
             CancelUrl = "https://localhost:7151"
         };
 
+        // slanje mejla o uspesnoj narudzbini
+
+
         // kreiranje sesije za placanje (checkout sesija)
         var servis = new SessionService();
         Session sesija = servis.Create(options);

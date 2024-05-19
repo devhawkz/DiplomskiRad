@@ -7,11 +7,11 @@ namespace Client.Authentication;
 public class CustomAuthenticationStateProvider(AuthenticationService authenticationService, IToolsService tools) : AuthenticationStateProvider
 {
     // koristi se kada korisnik nije identifikovan
-    private ClaimsPrincipal _gost = new(new ClaimsIdentity()); 
+    private ClaimsPrincipal _gost = new(new ClaimsIdentity());
 
     public async override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        try 
+        try
         {
             var getSesijuKorisnika = await authenticationService.GetDetaljeKorisnika();
 
