@@ -6,47 +6,59 @@
 @implements IDisposable;
 @inject NavigationManager NavManager;
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-6">
-            <EditForm Enhance Model="korisnik" OnValidSubmit="UpravljajRegistracijom">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="card">
-                    <div class="card-header">Registracija</div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Ime i prezime</label>
-                            <InputText @bind-Value="korisnik.Ime" class="form-control" />
-                        </div>
+<EditForm Enhance Model="korisnik" OnValidSubmit="UpravljajRegistracijom">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-12 col-lg-10">
+                    <div class="wrap d-md-flex">
+                        <div class="login-wrap p-4 p-lg-5">
+                            <div class="d-flex">
+                                <div class="w-100">
+                                    <h3 class="mb-4">Registracija</h3>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="name">Ime i Prezime</label>
+                                <input type="text" @bind="korisnik.Ime" class="form-control" placeholder="Ime i prezime" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="name">Email</label>
+                                <input type="text" @bind="korisnik.Email" class="form-control" placeholder="Email adresa" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="password">Lozinka</label>
+                                <input type="password" @bind="korisnik.Lozinka" class="form-control" placeholder="Lozinka" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="password">Potvrdi lozinku</label>
+                                <input type="password" @bind="korisnik.PotvrdaLozinke" class="form-control" placeholder="Potvrdi lozinku" />
+                            </div>
+                            <div class="form-group">
+                                @if (messageDialogService.PrikaziDugmeSacuvaj)
+                                {
+                                    <button type="submit" class="form-control btn btn-primary submit px-3">Prijavi se</button>
+                                }
 
-                        <div class="form-group mt-3">
-                            <label class="form-label">Email</label>
-                            <InputText @bind-Value="korisnik.Email" class="form-control" />
+                            </div>
                         </div>
-
-                        <div class="form-group mt-3">
-                            <label class="form-label">Lozinka</label>
-                            <input type="password" @bind="korisnik.Lozinka" class="form-control" />
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label class="form-label">Ponovo unesi lozinku</label>
-                            <input type="password" @bind="korisnik.PotvrdaLozinke" class="form-control" />
-                        </div>
-                        <div class="form-group mt-3">
-                            @if (messageDialogService.PrikaziDugmeSacuvaj)
-                            {
-                                <button class="btn btn-outline-primary float-end" type="submit">Pošalji</button>
-                            }
-                            <BusyDugmeComponent PrikaziBusyDugme=messageDialogService.PrikaziBusyDugme />
+                        <div class="text-wrap p-4 p-lg-5 text-center d-flex align-items-center order-md-last">
+                            <div class="text w-100">
+                                <h2>Imate nalog?</h2>
+                                <a href="/nalog/prijava" class="btn btn-white btn-outline-white">Prijavi se</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </EditForm>
+            </div>
         </div>
-    </div>
-</div>
+    </section>
+</EditForm>
+
 <!--prikazivanje poruke-->
 <MessageDialog @ref="messageDialogService.messageDialog" />
 
@@ -60,17 +72,17 @@
     {
         messageDialogService.PrikaziDugmeSacuvaj = false;
         messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
-        var (flag, poruka) = await nalogService.RegistracijaKorisnika(korisnik);
+        var (flag, poruka) = await nalogService.RegistracijaAdmina(korisnik);
 
-        if(flag)
+        if (flag)
         {
             var prijavaResponse = await nalogService.Prijava(new PrijavaDTO()
-            {
-                Email = korisnik.Email,
-                Lozinka = korisnik.Lozinka
-            });
+                {
+                    Email = korisnik.Email,
+                    Lozinka = korisnik.Lozinka
+                });
 
-            if(prijavaResponse.Flag)
+            if (prijavaResponse.Flag)
             {
                 var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
                 await customAuthStateProvider.UpdateAuthenticationState(new TokenProp() { Token = prijavaResponse.Token, RefreshToken = prijavaResponse.RefreshToken });
@@ -94,3 +106,4 @@
     public void Dispose() => messageDialogService.Action -= StateHasChanged;
 
 }
+

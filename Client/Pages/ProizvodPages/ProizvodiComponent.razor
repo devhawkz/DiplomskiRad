@@ -51,7 +51,7 @@ else
     public bool PrikaziDetaljeProizvoda { get; set; } = false;
 
     public Proizvod DetaljiProizvoda { get; set; } = new();
-    public List<Proizvod> ListaProizvodaInterna { get; set; } = new();
+    public List<Proizvod>? ListaProizvodaInterna { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -71,7 +71,7 @@ else
     {
         proizvodService.ProizvodiIsteKategorije = null!;
 
-        // uzima se lista sa servera, zato sto se ta lista moze cesto menjati i moze biti velika, te je bolje uzimati direktno sa servera, a ne iz memorije pregledaca -- detaljnije u svesci
+        //uzima se lista sa servera, zato sto se ta lista moze cesto menjati i moze biti velika, te je bolje uzimati direktno sa servera, a ne iz memorije pregledaca -- detaljnije u svesci
         await UcitajPodatke();
     }
 
@@ -79,7 +79,6 @@ else
     {
         bool preporuceno = false;
         await proizvodService.GetProizvode(preporuceno);
-        ListaProizvodaInterna = proizvodService.SviProizvodi;
     }
 
     void HandleBackClickedEvent()

@@ -1,4 +1,4 @@
-﻿<dialog id="my-dialog" style="border: 5px solid lightBlue; min-width: 300px">
+﻿﻿<dialog id="my-dialog" style="border: 5px solid lightBlue; min-width: 300px">
     <div class="card">
         <div class="card-header">Obaveštenje!</div>
         <div class="card-body">
@@ -23,10 +23,10 @@
         Poruka = poruka;
 
         // obavestava komponentu da se njeno stanje promenilo, to ce izazvati ponovno ucitavanje te komponente kada je to moguce
-        StateHasChanged(); 
+        StateHasChanged();
     }
 
     public async Task PrikaziPoruku() => await js.InvokeVoidAsync("ShowDialog");
 
-// stanje komponente koju mi kreiramo je lokalno stanje, nije globalno, ali imamo globalnu metodu koju mozemo pozvati van komponente koja ce postaviti stanje ove komponente
+    // stanje komponente koju mi kreiramo je lokalno stanje, nije globalno, ali imamo globalnu metodu koju mozemo pozvati van komponente koja ce postaviti stanje ove komponente
 }

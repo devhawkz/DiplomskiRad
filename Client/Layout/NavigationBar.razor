@@ -1,4 +1,4 @@
-﻿@using Client.Authentication
+﻿﻿@using Client.Authentication
 ﻿@using Client.Pages.Shared;
 
 @inject NavigationManager NavManager;
@@ -28,12 +28,12 @@
         <div class="collapse navbar-collapse fw-bold" id="navbarSupportedContent" style="margin-left:25vw">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="font-family:MojFont">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"  style="margin-right:20px;" href="#">POCETNA</a>
+                    <a class="nav-link active" aria-current="page" style="margin-right:20px;" href="#">POCETNA</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" style="margin-right:20px"; href=" /proizvodi">PROIZVODI</a>
+                    <a class="nav-link d-flex align-items-center" style="margin-right:20px" ; href=" /proizvodi">PROIZVODI</a>
                 </li>
-                
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Nalog
@@ -41,11 +41,29 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="font-family:sans-serif">
                         <AuthorizeView>
                             <Authorized>
+                                @if(isAdmin)
+                                {
+                                    string dodajProizvod = "/dodaj-proizvod";
+                                    string dodajKategoriju = "/dodaj-kategoriju";
+
+                                    <li>
+                                        <button class="btn btn-secondary" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj proizvod</button>
+                                    </li>
+                                    
+                                    <li><hr class="dropdown-divider"></li>
+                                    
+                                    <li>
+                                        <button class="btn btn-secondary" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj kategoriju</button>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+
                                 <li>
-                                    <button class="btn btn-danger btn-none" @onclick="OdjavaKorisnika"> <i class="fa fa-lock-open"></i> Odjava</button>
+                                    <button class="btn btn-danger btn-none " @onclick="OdjavaKorisnika"> <i class="fa fa-lock-open"></i> Odjava</button>
                                 </li>
                             </Authorized>
-                        
+
                             <NotAuthorized>
                                 @{
                                     string registracija = "registracija-korisnika";
@@ -53,13 +71,13 @@
                                 }
 
                                 <li>
-                                    <button class="btn btn-none" @onclick="() => Preusmeri(prijava)"> <i class="fa fa-lock"></i> Prijava</button>
+                                    <button class="btn btn-secondary" @onclick="() => Preusmeri(prijava)"> <i class="fa fa-lock"></i> Prijava</button>
                                 </li>
 
                                 <li><hr class="dropdown-divider"></li>
-                            
+
                                 <li>
-                                    <button class="btn btn-none" @onclick="() => Preusmeri(registracija)"> <i class="fa fa-sign-in"></i> Registracija</button>
+                                    <button class="btn btn-secondary" @onclick="() => Preusmeri(registracija)"> <i class="fa fa-sign-in"></i> Registracija</button>
                                 </li>
                             </NotAuthorized>
                         </AuthorizeView>
@@ -88,11 +106,18 @@
 @code {
     public bool PrikaziPretragu { get; set; }
     public bool PrikaziPretraguIkona { get; set; } = true;
+    private bool isAdmin = false;
 
     protected async override Task OnInitializedAsync()
     {
         await korpaService.GetKorpaCount();
         korpaService.KorpaAction += StateHasChanged;
+
+        var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
+        var authState = await customAuthenticationService.GetAuthenticationStateAsync();
+        var korisnik = authState.User;
+        isAdmin = korisnik.IsInRole("Admin");
+
     }
 
     // metoda koja prikazuje polje za unos teksta za pretragu
@@ -110,7 +135,7 @@
     private async Task OdjavaKorisnika()
     {
         var lista = await korpaService.MojeNarudzbine();
-        if(lista is not null && lista.Count > 0)
+        if (lista is not null && lista.Count > 0)
             foreach (var stavka in lista)
                 await korpaService.ObrisiProizvodIzKorpe(stavka);
 
