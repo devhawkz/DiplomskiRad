@@ -5,23 +5,21 @@
     var listaPodataka = SviProizvodi.Skip(SkipVrednost).Take(TakeVrednost).ToList(); 
     
     <div class="container-fluid">
-        <div class="row featured__filter">
+        <div class="row">
             @foreach(var proizvod in listaPodataka!.OrderBy(_=> _.PreporucenProizvod))
             {
-                <div class="col-lg-2 col-md-3 col-sm-6 border-success">
-                    <div class="featured__item" style="width: 200px;">
-                        <div class="featured__item__pic set-bg">
-                            <img src="@proizvod.Base64Img" width="150" height="200"  @onclick="() => PrikaziDetaljeProizvoda(proizvod)" style="cursor:pointer;"/>
-                            <ul class="featured__item__pic__hover">
-                                <li><a href="#"><i class="fa fa-heart"></i></a></li>
-                                <li><a href="#"><i class="fa fa-retweet"></i></a></li>
-                                <li><a @onclick="() => DodajUKorpu(proizvod)" style="cursor:pointer;"><i class="fa fa-shopping-cart text-danger"></i></a></li>
-                            </ul>
+                <div class="col-md-3 col-sm-6">
+                    <div class="product-grid">
+                        <div class="product-image">
+                            <a @onclick="() => PrikaziDetaljeProizvoda(proizvod)" class="image">
+                                <img src="@proizvod.Base64Img" style="cursor:pointer;" />
+                            </a>
                         </div>
-                        <div class="featured__item__text">
-                            <h6 class="text-primary" @onclick="() => PrikaziDetaljeProizvoda(proizvod)" style="cursor:pointer;">@proizvod.Naziv</h6>
-                            <!--Konvertuje cenu u string (pr. $123.45)-->
-                            <h5 class="text-danger">@proizvod.Cena.ToString("$#.##")</h5>
+                        <div class="product-content">
+                            <span class="product-category"><a href="">@proizvod.Kategorija!.Naziv</a></span>
+                            <h3 class="title" @onclick="() => PrikaziDetaljeProizvoda(proizvod)">@proizvod.Naziv</h3>
+                            <div class="price">@proizvod.Cena.ToString("#.## RSD")</div>
+                            <a @onclick="() => DodajUKorpu(proizvod)" class="add-to-cart"><i class="fa fa-shopping-cart"></i> Dodaj u korpu</a>
                         </div>
                     </div>
                 </div>

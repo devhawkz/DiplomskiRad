@@ -88,23 +88,28 @@
                 </div>
             }
             else
-            {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p role="alert" class="alert alert-info">Niste dodali nijedan proizvod u korpu!</p>
+            {             
+                <div id="notfound">                
+                    <div class="notfound">
+                        <div class="notfound-404">
                         </div>
+                        <h2>Korpa je prazna</h2>
+                        <p>Nemate nijedan proizvod u korpi</p>
+                        <a href="/proizvodi">Vidi proizvode</a>
                     </div>
-                </div>
+                </div>  
             }
         }
     </Authorized>
     <NotAuthorized>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <p role="alert" class="alert alert-warning">Morate biti prijavljeni da biste pristupili ovoj stranici..</p>
+        <div id="notfound">
+            <div class="notfound">
+                <div class="notfound-404">
+                    <h1>404</h1>
                 </div>
+                <h2>Niste prijavljeni</h2>
+                <p>Morate biti prijavljeni da bi videli sadržaj korpe</p>
+                <a href="/nalog/prijava">Prijava</a>
             </div>
         </div>
     </NotAuthorized>

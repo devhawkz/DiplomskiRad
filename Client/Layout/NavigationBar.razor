@@ -6,106 +6,92 @@
 
 @implements IDisposable;
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section"></h2>
+				</div>
+			</div>
+		</div>
+		
+		<div class="container-fluid px-md-5">
+			<div class="row justify-content-between">
+				<div class="col-md-8 order-md-last">
+					<div class="row">
+						<div class="col-md-6 text-center">
+							<a class="navbar-brand" href="index.html">Logistica <span>Architecture Agency</span></a>
+						</div>
+						<div class="col-md-6 d-md-flex justify-content-end mb-md-0 mb-3">
+    						<PretragaComponent></PretragaComponent>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 d-flex">
+					<div class="social-media">
+		    		<p class="mb-0 d-flex">
+                        <a @onclick="IdiUKorpu" class="d-flex align-items-center justify-content-center">
+							<i class="fa-solid fa-cart-shopping"></i>
+							<sub class="small text-danger fw-bold">@korpaService.KorpaCount</sub>
+						</a>
 
-        <a class="navbar-brand" @onclick="IdiUKorpu" style="cursor:pointer;">
-            <i class="fa fa-cart-shopping text-danger"></i>
-            <span class="small text-danger fw-bold">@korpaService.KorpaCount</span>
+		    		</p>
+	        </div>
+				</div>
+			</div>
+		</div>
+		<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	    <div class="container-fluid">
+	    
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="fa fa-bars"></span> Meni
+	      </button>
+	      <div class="collapse navbar-collapse" id="ftco-nav">
+	        <ul class="navbar-nav m-auto">
+	        	<li class="nav-item active"><a href="/" class="nav-link">Početna</a></li>
+	        	<li class="nav-item"><a href="/proizvodi" class="nav-link">Proizvodi</a></li>
+				<li class="nav-item"><a href="#" class="nav-link">Kontakt</a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-user"></i></a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<AuthorizeView>
+							<Authorized>
+								@if (isAdmin)
+								{
+									string dodajProizvod = "/dodaj-proizvod";
+									string dodajKategoriju = "/dodaj-kategoriju";
 
-            <h6>
-                Pozdrav,
-                <AuthorizeView>
-                    <Authorized> @context.User.Identity!.Name</Authorized>
-                    <NotAuthorized> Gost</NotAuthorized>
-                </AuthorizeView>
-            </h6>
-        </a>
+									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj proizvod</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse fw-bold" id="navbarSupportedContent" style="margin-left:25vw">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="font-family:MojFont">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" style="margin-right:20px;" href="#">POCETNA</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" style="margin-right:20px" ; href=" /proizvodi">PROIZVODI</a>
-                </li>
+									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajKategoriju)">Dodaj kategoriju</a>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Nalog
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="font-family:sans-serif">
-                        <AuthorizeView>
-                            <Authorized>
-                                @if(isAdmin)
-                                {
-                                    string dodajProizvod = "/dodaj-proizvod";
-                                    string dodajKategoriju = "/dodaj-kategoriju";
+								}
 
-                                    <li>
-                                        <button class="btn btn-secondary" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj proizvod</button>
-                                    </li>
-                                    
-                                    <li><hr class="dropdown-divider"></li>
-                                    
-                                    <li>
-                                        <button class="btn btn-secondary" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj kategoriju</button>
-                                    </li>
+								<a class="dropdown-item" @onclick="OdjavaKorisnika"><i class="fa fa-lock-open"></i> Odjava</a>
+							</Authorized>
 
-                                    <li><hr class="dropdown-divider"></li>
-                                }
+							<NotAuthorized>
+								@{
+									string registracija = "registracija-korisnika";
+									string prijava = "prijava";
+								}
 
-                                <li>
-                                    <button class="btn btn-danger btn-none " @onclick="OdjavaKorisnika"> <i class="fa fa-lock-open"></i> Odjava</button>
-                                </li>
-                            </Authorized>
+								<a class="dropdown-item" @onclick="() => Preusmeri(prijava)"><i class="fa fa-lock"></i>&nbsp;&nbsp;&nbsp;Prijava</a>
 
-                            <NotAuthorized>
-                                @{
-                                    string registracija = "registracija-korisnika";
-                                    string prijava = "prijava";
-                                }
+								<a class="dropdown-item" @onclick="() => Preusmeri(registracija)"><i class="fa fa-sign-in"></i> &nbsp;&nbsp;&nbsp;Registracija</a>
+							</NotAuthorized>
+						</AuthorizeView>
+					</div>
+				</li>
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+    <!-- END nav -->
 
-                                <li>
-                                    <button class="btn btn-secondary" @onclick="() => Preusmeri(prijava)"> <i class="fa fa-lock"></i> Prijava</button>
-                                </li>
-
-                                <li><hr class="dropdown-divider"></li>
-
-                                <li>
-                                    <button class="btn btn-secondary" @onclick="() => Preusmeri(registracija)"> <i class="fa fa-sign-in"></i> Registracija</button>
-                                </li>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    </ul>
-                </li>
-            </ul>
-
-            <!--Klikom na lupicu setuje se PrikaziPretragu na true i prikazuje se polje za unos i skriva se sama lupica-->
-            @if (PrikaziPretraguIkona)
-            {
-                <button @onclick="PretragaKlik" class="btn btn-none">
-                    <i class="fa fa-magnifying-glass fs-5" style="cursor:pointer"></i>
-                </button>
-            }
-
-            @if (PrikaziPretragu)
-            {
-                <PretragaComponent></PretragaComponent>
-            }
-
-        </div>
-    </div>
-</nav>
 
 
 @code {
-    public bool PrikaziPretragu { get; set; }
-    public bool PrikaziPretraguIkona { get; set; } = true;
+
     private bool isAdmin = false;
 
     protected async override Task OnInitializedAsync()
@@ -120,12 +106,7 @@
 
     }
 
-    // metoda koja prikazuje polje za unos teksta za pretragu
-    void PretragaKlik()
-    {
-        PrikaziPretragu = true;
-        PrikaziPretraguIkona = !PrikaziPretragu;
-    }
+    
 
     void Preusmeri(string url)
     {

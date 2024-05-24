@@ -1,11 +1,13 @@
 ﻿@inject NavigationManager NavManager;
 
-<form class="d-flex" method="post" @onsubmit="PretraziProizvod">
-    <AntiforgeryToken></AntiforgeryToken>
-    <input class="form-control me-2" @bind="Filter" type="search" placeholder="Pretraži..." aria-label="Search">
-    <button class="btn btn-outline-success" type="submit">Pretraga</button>
+<form class="searchform order-lg-last" method="post" @onsubmit="PretraziProizvod">
+    <div class="form-group d-flex">
+        <AntiforgeryToken></AntiforgeryToken>
+        <input type="search" @bind="Filter" class="form-control pl-3" placeholder="Pretraži..." aria-label="Search">
+        <button type="submit" placeholder="" class="form-control search"><span class="fa-solid fa-magnifying-glass" style="color: #fff;"></span></button>
+      </div>
 </form>
-
+<i class="fa-solid fa-magnifying-glass" style="color: #f1f2f4;"></i>
 @code {
     public string Filter { get; set; } = string.Empty;
 

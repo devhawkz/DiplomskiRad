@@ -2,28 +2,6 @@
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
-                <NotAuthorized>
-                    @if (!context.User.Identity!.IsAuthenticated)
-                    {
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p role="alert" class="alert alert-warning">Morate biti prijavljeni da biste pristupili ovoj stranici..</p>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p role="alert" class="alert alert-warning">Nemate dozvolu za pristup ovoj stranici.</p>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </NotAuthorized>
                 <Authorizing>
                     <div class="container">
                         <div class="row">
@@ -39,11 +17,14 @@
         <NotFound>
         <PageTitle>Error 404</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p role="alert" class="alert alert-info">Greška 404. Tražena stranica ne postoji.</p>
+                <div id="notfound">
+                    <div class="notfound">
+                        <div class="notfound-404">
+                            <h1>404</h1>
                         </div>
+                        <h2>Stranica nije pronađena</h2>
+                        <p>Stranica koju ste tražili ne postoji ili je privremeno nedostupna</p>
+                        <a href="/">Nazad na početnu</a>
                     </div>
                 </div>
             </LayoutView>
