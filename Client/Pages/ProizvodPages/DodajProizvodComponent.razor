@@ -50,6 +50,11 @@ else
                                                 <input type="text" @bind="@proizvod.Cena" class="form-control" placeholder="Cena" />
                                             </div>
                                             <div class="form-group mb-3">
+                                                <label class="label">Količina</label>
+                                                <input type="number" @bind="@proizvod.Kolicina" class="form-control" placeholder="Količina" />
+                                            </div>
+
+                                            <div class="form-group mb-3">
                                                 <label class="label" data-toggle="tooltip" title="Označite ako želite da proizvod preporučite kupcima">Preporuka:</label>
                                                 <input type="checkbox" class="custom-checkbox" @bind="@proizvod.PreporucenProizvod"  />
                                             </div>
@@ -182,11 +187,11 @@ else
     //InputFileChangeEventArgs predstavlja argument koji se proslijeđuje kada se dogodi promena u input elementu datoteke.Ovaj argument sadrži informacije o toj promeni, posebno o datoteci koja je odabrana ili promenjena. Omogucava nam pristup fajlu
     async Task UploadSliku(InputFileChangeEventArgs e)
     {
-        //proverava da li se u nazivu fajla nalazi .png ekstenzija (string)
-        if (e.File.Name.ToLower().Contains(".png"))
+        //proverava da li se u nazivu fajla nalazi .jpg ekstenzija (string)
+        if (e.File.Name.ToLower().Contains(".jpg"))
         {
-            // postavlja format slike na png
-            var format = "image/png";
+            // postavlja format slike na jpg
+            var format = "image/jpg";
 
             //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u jpg formatu, a dimenzije su ograničene na 500x500 piksela.
             var resizeSliku = await e.File.RequestImageFileAsync(format, 500, 500);
@@ -211,7 +216,7 @@ else
             return;
         }
 
-        uploadSlikePoruka = "Samo slika u png formatu.";
+        uploadSlikePoruka = "Samo slika u jpg formatu.";
         return;
     }
 
