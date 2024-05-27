@@ -1,8 +1,14 @@
-﻿
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
 
 body {
     line-height: 1.5;
     font-family: 'Poppins', sans-serif;
+    flex: 1;
 }
 
 * {
@@ -28,8 +34,8 @@ ul {
 .footer {
     background-color: #24262b;
     background: -moz-linear-gradient(75deg, #24262b 55%, #e91e63 100%);
-    background: -webkit-gradient(left top, right bottom, color-stop(55%%, #24262b), color-stop(100%, #e91e63));
-    background: -webkit-linear-gradient(-75deg, #24262b 65%%, #e91e63 100%);
+    background: -webkit-gradient(left top, right bottom, color-stop(55%, #24262b), color-stop(100%, #e91e63));
+    background: -webkit-linear-gradient(-75deg, #24262b 65%, #e91e63 100%);
     background: -o-linear-gradient(-75deg, #24262b 55%, #e91e63 100%);
     background: -ms-linear-gradient(-75deg, #24262b 55%, #e91e63 100%);
     background: -webkit-linear-gradient(315deg, #24262b 55%, #e91e63 100%);
@@ -89,7 +95,7 @@ ul {
         display: inline-block;
         height: 40px;
         width: 40px;
-        background-color: rgba(255,255,255,0.2);
+        background-color: rgba(255, 255, 255, 0.2);
         margin: 0 10px 10px 0;
         text-align: center;
         line-height: 40px;

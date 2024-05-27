@@ -41,7 +41,9 @@ public class KorisnickiNalogRespository(DataContext context, ITools tools, IEmai
             {
                 KorisnickiNalogId = korisnikid,
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                DatumIsteka = DateTime.Now
+
             });
             await tools.Sacuvaj();
         }

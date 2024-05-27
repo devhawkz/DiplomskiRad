@@ -1,4 +1,8 @@
-﻿* {
+﻿#changeCursor {
+    cursor: pointer;
+}
+
+* {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -79,7 +83,16 @@ body {
         font-size: 14px;
         text-decoration: none;
         text-transform: uppercase;
-        background: #dc3545;
+        background-color: #24262b;
+        background: -moz-linear-gradient(75deg, #24262b 55%, #e91e63 100%);
+        background: -webkit-gradient(left top, right bottom, color-stop(55%%, #24262b), color-stop(100%, #e91e63));
+        background: -webkit-linear-gradient(-75deg, #24262b 65%%, #e91e63 100%);
+        background: -o-linear-gradient(-75deg, #24262b 55%, #e91e63 100%);
+        background: -ms-linear-gradient(-75deg, #24262b 55%, #e91e63 100%);
+        background: -webkit-linear-gradient(315deg, #24262b 55%, #e91e63 100%);
+        background: -o-linear-gradient(315deg, #24262b 55%, #e91e63 100%);
+        background: linear-gradient(135deg, #24262b 55%, #e91e63 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#24262b', endColorstr='#e91e63', GradientType=1 );
         display: inline-block;
         padding: 16px 38px;
         border: 2px solid transparent;
@@ -91,9 +104,19 @@ body {
     }
 
         .notfound a:hover {
-            background-color: #fff;
             border-color: #dc3545;
-            color: #dc3545;
+            color: #fff;
+            background-color: #24262b;
+            background: -moz-linear-gradient(75deg, #e91e63 55%, #24262b 100%);
+            background: -webkit-gradient(left top, right bottom, color-stop(55%%, #e91e63), color-stop(100%, #24262b));
+            background: -webkit-linear-gradient(-75deg, #e91e63 65%%, #24262b 100%);
+            background: -o-linear-gradient(-75deg, #e91e63 55%, #24262b 100%);
+            background: -ms-linear-gradient(-75deg, #e91e63 55%, #24262b 100%);
+            background: -webkit-linear-gradient(315deg, #e91e63 55%, #24262b 100%);
+            background: -o-linear-gradient(315deg, #e91e63 55%, #24262b 100%);
+            background: linear-gradient(135deg, #e91e63 55%, #24262b 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e91e63', endColorstr='#24262b', GradientType=1 );
+            font-weight: 700;
         }
 
 @media only screen and (max-width: 480px) {

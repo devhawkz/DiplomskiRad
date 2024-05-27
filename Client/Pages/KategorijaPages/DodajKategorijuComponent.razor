@@ -13,54 +13,71 @@ else
         <Authorized>
             @if(isAdmin)
             {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <EditForm Model="kategorija" OnValidSubmit="UpravljajKategorijom" Context="formContext">
-                                <DataAnnotationsValidator />
-                                <ValidationSummary />
-                                <div class="card">
-                                    <div class="card-header">Dodaj kategoriju</div>
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label class="form-label">Naziv</label>
-                                            <InputText @bind-Value="kategorija.Naziv" class="form-control"></InputText>
+                <EditForm Model="kategorija" OnValidSubmit="UpravljajKategorijom" Context="formContext">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <section class="ftco-section">
+                        <div class="container">
+                            <div class="row justify-content-center"></div>
+                            <div class="row justify-content-center">
+                                <div class="col-md-12 col-lg-10">
+                                    <div class="wrap d-md-flex">
+                                        <div class="login-wrap p-4 p-lg-5">
+                                            <div class="d-flex">
+                                                <div class="w-100">
+                                                    <h3 class="mb-4">Dodaj novu kategoriju</h3>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label" for="name">Naziv kategorije</label>
+                                                <input type="text" @bind="@kategorija.Naziv" class="form-control" placeholder="Naziv kategorije" />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <button type="submit" class="form-control btn btn-primary submit px-3">Sačuvaj kategoriju  <i class="fa fa-plus"></i></button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="form-group mt-3">
-                                            @if (messageDialogService.PrikaziDugmeSacuvaj)
-                                            {
-                                                <button type="submit" class="btn btn-outline-primary">Sačuvaj kategoriju <i class="fa fa-plus"></i></button>
-                                            }
-                                            <BusyDugmeComponent PrikaziBusyDugme="messageDialogService.PrikaziBusyDugme"></BusyDugmeComponent>
+                                        <div class="text-wrap p-4 p-lg-5 text-center d-flex align-items-center order-md-last">
+                                            <div class="text w-100">
+                                                <h2>Želite da dodate proizvod?</h2>
+                                                <a href="/dodaj-proizvod" class="btn btn-white btn-outline-white">Dodaj proizvod</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </EditForm>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </section>
+                </EditForm>
+
+
                 <MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
             }
 
             else
             {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p role="alert" class="alert alert-warning">Nemate ovlašćenje za ovu operaciju! </p>
+                <div id="notfound">
+                    <div class="notfound">
+                        <div class="notfound-404">
+                            <h1>404</h1>
                         </div>
+                        <h2>Zabranjen pristup resursu</h2>
+                        <p>Nemate ovlašćenje za ovu operaciju</p>
+                        <a href="/">Nazad na početnu</a>
                     </div>
                 </div>
             }
         </Authorized>
         <NotAuthorized>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <p role="alert" class="alert alert-warning">Morate biti prijavljeni da biste pristupili ovoj stranici..</p>
+            <div id="notfound">
+                <div class="notfound">
+                    <div class="notfound-404">
+                        <h1>404</h1>
                     </div>
+                    <h2>Niste prijavljeni</h2>
+                    <p>Morate biti prijavljeni da bi mogli da pristupite ovoj stranici.</p>
+                    <a href="/nalog/prijava">Prijava</a>
                 </div>
             </div>
         </NotAuthorized>

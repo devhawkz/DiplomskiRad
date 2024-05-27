@@ -19,7 +19,7 @@
 				<div class="col-md-8 order-md-last">
 					<div class="row">
 						<div class="col-md-6 text-center">
-							<a class="navbar-brand" href="index.html">Logistica <span>Architecture Agency</span></a>
+					<a class="navbar-brand" href="/"><img src="resursi/logo_welding.png" width="100" height="100"/><span></span></a>
 						</div>
 						<div class="col-md-6 d-md-flex justify-content-end mb-md-0 mb-3">
     						<PretragaComponent></PretragaComponent>
@@ -51,7 +51,7 @@
 	        	<li class="nav-item"><a href="/proizvodi" class="nav-link">Proizvodi</a></li>
 				<li class="nav-item"><a href="#" class="nav-link">Kontakt</a></li>
 				<li class="nav-item dropdown">
-					<a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-user"></i></a>
+					<a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;"><i class="fa-regular fa-user"></i></a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<AuthorizeView>
 							<Authorized>
@@ -60,13 +60,13 @@
 									string dodajProizvod = "/dodaj-proizvod";
 									string dodajKategoriju = "/dodaj-kategoriju";
 
-									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajProizvod)">Dodaj proizvod</a>
+									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajProizvod)" style="cursor:pointer;"><i class="fa-solid fa-plus"></i>&nbsp;Dodaj proizvod</a>
 
-									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajKategoriju)">Dodaj kategoriju</a>
+									<a class="dropdown-item" @onclick="() => NavManager.NavigateTo(dodajKategoriju)" style="cursor:pointer;"><i class="fa-solid fa-layer-group"></i>&nbsp;Dodaj kategoriju</a>
 
 								}
-
-								<a class="dropdown-item" @onclick="OdjavaKorisnika"><i class="fa fa-lock-open"></i> Odjava</a>
+								<a class="dropdown-item" style="cursor:pointer;"><i class="fa-regular fa-user"></i> Profil</a>
+								<a class="dropdown-item" style="cursor:pointer;"  @onclick="OdjavaKorisnika"><i class="fa fa-lock-open"></i> Odjava</a>
 							</Authorized>
 
 							<NotAuthorized>
@@ -75,9 +75,9 @@
 									string prijava = "prijava";
 								}
 
-								<a class="dropdown-item" @onclick="() => Preusmeri(prijava)"><i class="fa fa-lock"></i>&nbsp;&nbsp;&nbsp;Prijava</a>
+								<a class="dropdown-item" @onclick="() => Preusmeri(prijava)" style="cursor:pointer;"><i class="fa fa-lock"></i>&nbsp;&nbsp;&nbsp;Prijava</a>
 
-								<a class="dropdown-item" @onclick="() => Preusmeri(registracija)"><i class="fa fa-sign-in"></i> &nbsp;&nbsp;&nbsp;Registracija</a>
+								<a class="dropdown-item" @onclick="() => Preusmeri(registracija)" style="cursor:pointer;"><i class="fa fa-sign-in"></i> &nbsp;&nbsp;&nbsp;Registracija</a>
 							</NotAuthorized>
 						</AuthorizeView>
 					</div>

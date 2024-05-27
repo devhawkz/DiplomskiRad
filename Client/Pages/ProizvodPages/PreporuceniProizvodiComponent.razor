@@ -1,5 +1,6 @@
 ﻿@implements IDisposable;
 @inject NavigationManager NavManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
     <div class="container-fluid mt-5">
         <div class="row">
@@ -14,20 +15,35 @@
                             @if (preporucenaListaProizvoda is null) return;
                             @foreach (var proizvod in preporucenaListaProizvoda)
                             {
-                                <div class="card">
-                                    <div class="card-body">
-                                        @if (proizvod.DatumPostavljanja.AddDays(30) > DateTime.Now)
-                                        {
-                                            <span class="badge bg-primary d-flex  align-items-end float-end" style="width:50px">Novo</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-none d-flex  align-items-end float-end" style="width:50px; height:20px;"></span>
-                                        }
-                                    <img class="card-img-top childImage" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" @onclick="() => PrikaziProizvod(proizvod)"/>
-                                        <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@proizvod.Naziv</div>
+                            <div class="container page-wrapper">
+                                <div class="page-inner">
+                                    <div class="row">
+                                        <div class="el-wrapper">
+                                            <div class="box-up">
+                                                <img class="img" src="@proizvod.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;">
+                                                <div class="img-info">
+                                                    <div class="info-inner">
+                                                        <span class="p-name">@proizvod.Naziv</span>
+                                                        <span class="p-company">@proizvod.Kategorija!.Naziv</span>
+                                                    </div>
+                                                </div>
+                                                <div class="box-down">
+                                                    <div class="h-bg">
+                                                        <div class="h-bg-inner"></div>
+                                                    </div>
+                                                    <a class="cart" @onclick="() => PrikaziProizvod(proizvod)" style="cursor:pointer;">
+                                                        <span class="add-to-cart" >
+                                                            <span class="txt" >Prikaži detalje</span>
+                                                        </span>
+                                                      
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+
                             }
                             <img src="../resursi/unapred.png" width="30" height="30" id="styleCursor" @onclick="NarednoDugme" />
                         </div>
@@ -44,13 +60,13 @@
     List<Proizvod>preporucenaListaProizvoda = new();
 
     // predstavlja maks br. elemenata na jednoj strani -- po default-u je 5 
-    public int VelicinaStrane { get; set; } = 5;
+    public int VelicinaStrane { get; set; } = 4;
 
     //predstavlja br. elemeanta koji treba da se preskoce prilikom prikazivanja -- po default-u 0 za prvu stranu
     public int Skip { get; set; } = 0;
 
     //predstavlja br. elemenata koji se uzimaju za prikazivanje -- po default-u 5, ako ima dovoljno proizvoda, ako nema onda ce se prikazati preostali proizvodi 
-    public int Take { get; set; } = 5;
+    public int Take { get; set; } = 4;
 
 
     protected async override Task OnInitializedAsync()

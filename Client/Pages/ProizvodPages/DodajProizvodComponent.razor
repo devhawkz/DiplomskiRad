@@ -13,108 +13,100 @@ else
        <Authorized>
             @if(isAdmin)
             {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-6 w-100">
-                            <EditForm Model="proizvod" Enhance OnValidSubmit="UpravljajProizvodom" Context="formContext">
-                                <DataAnnotationsValidator />
-                                <ValidationSummary />
+                <EditForm Model="proizvod" Enhance OnValidSubmit="UpravljajProizvodom" Context="formContext">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-                                <div class="card">
-                                    <div class="card-header">Dodaj proizvod</div>
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label class="form-label">Naziv</label>
-                                            <InputText @bind-Value="proizvod.Naziv" class="form-control"></InputText>
-                                        </div>
-
-                                        <!-- Prikaz kategorije -->
-                                        <div class="form-group">
-                                            <label class="form-label">Izaberite kategoriju</label>
-                                            <InputSelect class="form-select form-control-sm" @bind-Value="@proizvod.KategorijaId">
-                                                @if (kategorijaService.SveKategorije is not null)
-                                                {
-                                                    <option selected>-- Izaberite kategoriju -- </option>
-                                                    @foreach (var kategorija in kategorijaService.SveKategorije)
+                    <section class="ftco-section">
+                        <div class="container">
+                            <div class="row justify-content-center"></div>
+                            <div class="row justify-content-center">
+                                <div class="col-md-12 col-lg-10">
+                                    <div class="wrap d-md-flex">
+                                        <div class="login-wrap p-4 p-lg-5">
+                                            <div class="d-flex">
+                                                <div class="w-100">
+                                                    <h3 class="mb-4">Dodaj novi proizvod</h3>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label" for="name">Naziv proizvoda</label>
+                                                <input type="text" @bind="@proizvod.Naziv" class="form-control" placeholder="Naziv proizvoda" />
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label" for="name">Kategorija</label>
+                                                <select @bind="@proizvod.KategorijaId" class="form-control">
+                                                    @if (kategorijaService.SveKategorije != null)
                                                     {
-                                                        <option value="@kategorija.Id">@kategorija.Naziv</option>
+                                                        @foreach (var kategorija in kategorijaService.SveKategorije)
+                                                        {
+                                                            <option value="@kategorija.Id">@kategorija.Naziv</option>
+                                                        }
                                                     }
-
-                                                }
-                                            </InputSelect>
-
+                                                </select>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label">Cena proizvoda</label>
+                                                <input type="text" @bind="@proizvod.Cena" class="form-control" placeholder="Cena" />
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label" data-toggle="tooltip" title="Označite ako želite da proizvod preporučite kupcima">Preporuka:</label>
+                                                <input type="checkbox" class="custom-checkbox" @bind="@proizvod.PreporucenProizvod"  />
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label">Opis proizvoda</label>
+                                                <textarea @bind="@proizvod.Opis" class="form-control" placeholder="Opis proizvoda"></textarea>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="label @(uploadSlikePoruka == "" ? "" : "text-danger")">
+                                                    @(uploadSlikePoruka == "" ? "Dodaj sliku" : uploadSlikePoruka)
+                                                </label>
+                                                <InputFile class="form-control" placeholder="Opis proizvoda" OnChange="UploadSliku"></InputFile>
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="form-control btn btn-primary submit px-3">Sačuvaj proizvod  <i class="fa fa-plus"></i></button>
+                                            </div>
                                         </div>
-
-                                        <div class="form-group mt-3">
-                                            <label class="form-label">Cena</label>
-                                            <InputNumber @bind-Value="proizvod.Cena" class="form-control"></InputNumber>
-                                        </div>
-
-                                        <div class="form-group mt-3">
-                                            <label class="form-label">Količina</label>
-                                            <InputNumber @bind-Value="proizvod.Kolicina" class="form-control"></InputNumber>
-                                        </div>
-
-                                        <div class="form-group mt-3">
-                                            <label class="form-label" data-toggle="tooltip" title="Označite ako želite da proizvod preporučite kupcima">Preporuka:</label>&nbsp;&nbsp;
-                                            <input class="form-check-input" type="checkbox" id="preporuceniProizvod" @bind="proizvod.PreporucenProizvod" />
-                                        </div>
-
-                                        <div class="form-group mt-3">
-                                            <label class="form-label">Opis</label>
-                                            <InputTextArea @bind-Value="proizvod.Opis" class="form-control"></InputTextArea>
-                                        </div>
-
-
-                                        <!--Ako promenljiva UploadSlikePoruka ne sadrzi vrednost onda nemoj da koristis nijednu css klasu,
-                                            ako sadrzi onda koristi text-danger.
-                                            Ako promenljiva UploadSlikePoruka ne sadrzi vrednost onda ispisi Dodaj sliku u labeli, ako sadrzi onda ispisi njenu vrednost
-                                        -->
-
-                                        <div class="form-group mt-3">
-                                            <label class="form-label @(uploadSlikePoruka == "" ? "" : "text-danger")">
-                                                @(uploadSlikePoruka == "" ? "Dodaj sliku" : uploadSlikePoruka)
-                                            </label>
-                                            <InputFile class="form-control" OnChange="UploadSliku"></InputFile>
-                                        </div>
-
-                                    </div>
-                                    <div class="footer">
-                                        <div class="form-group mt-3">
-                                            @if (messageDialogService.PrikaziDugmeSacuvaj)
-                                            {
-                                                <button type="submit" class="btn btn-outline-primary">Sačuvaj proizvod   <i class="fa fa-plus"></i></button>
-
-                                            }
-                                            <BusyDugmeComponent PrikaziBusyDugme="messageDialogService.PrikaziBusyDugme"></BusyDugmeComponent>
+                                        <div class="text-wrap p-4 p-lg-5 text-center d-flex align-items-center order-md-last">
+                                            <div class="text w-100">
+                                                <h2>Želite da dodate kategoriju?</h2>
+                                                <a href="/dodaj-kategoriju" class="btn btn-white btn-outline-white">Dodaj kategoriju</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </EditForm>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </section>  
+                </EditForm>
+                        
 
                 <!--Ukljucuje MessageDialog komponentu u render ove komponente i dodeljuje promenljivoj messageDialog referencu ka komponenti MessageDialog-->
                 <MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
             }
             else
             {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p role="alert" class="alert alert-warning">Nemate ovlašćenje za ovu operaciju! </p>
+                <div id="notfound">
+                    <div class="notfound">
+                        <div class="notfound-404">
+                            <h1>404</h1>
                         </div>
+                        <h2>Zabranjen pristup resursu</h2>
+                        <p>Nemate ovlašćenje za ovu operaciju</p>
+                        <a href="/">Nazad na početnu</a>
                     </div>
                 </div>
             }
         </Authorized>
         <NotAuthorized>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <p role="alert" class="alert alert-warning">Morate biti prijavljeni da biste pristupili ovoj stranici..</p>
+            <div id="notfound">
+                <div class="notfound">
+                    <div class="notfound-404">
+                        <h1>404</h1>
                     </div>
+                    <h2>Niste prijavljeni</h2>
+                    <p>Morate biti prijavljeni da bi mogli da pristupite ovoj stranici.</p>
+                    <a href="/nalog/prijava">Prijava</a>
                 </div>
             </div>
         </NotAuthorized>

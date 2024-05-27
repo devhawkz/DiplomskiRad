@@ -1,35 +1,43 @@
 ﻿@implements IDisposable;
+@inject NavigationManager NavManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if(SviProizvodi is not null)
 {
     var listaPodataka = SviProizvodi.Skip(SkipVrednost).Take(TakeVrednost).ToList(); 
     
-    <div class="container-fluid">
-        <div class="row">
-            @foreach(var proizvod in listaPodataka!.OrderBy(_=> _.PreporucenProizvod))
-            {
-                <div class="col-md-3 col-sm-6">
-                    <div class="product-grid">
-                        <div class="product-image">
-                            <a @onclick="() => PrikaziDetaljeProizvoda(proizvod)" class="image">
-                                <img src="@proizvod.Base64Img" style="cursor:pointer;" />
-                            </a>
-                        </div>
-                        <div class="product-content">
-                            <span class="product-category"><a href="">@proizvod.Kategorija!.Naziv</a></span>
-                            <h3 class="title" @onclick="() => PrikaziDetaljeProizvoda(proizvod)">@proizvod.Naziv</h3>
-                            <div class="price">@proizvod.Cena.ToString("#.## RSD")</div>
-                            <a @onclick="() => DodajUKorpu(proizvod)" class="add-to-cart"><i class="fa fa-shopping-cart"></i> Dodaj u korpu</a>
+    <div class="section-products">
+        <div class="container">
+            <div class="row">
+                @foreach (var proizvod in listaPodataka!.OrderBy(_ => _.PreporucenProizvod))
+                {
+                    <div class="col-md-3 col-sm-6">
+                        <div id="product-1" class="single-product">
+                            <div class="part-1">
+                                <a @onclick="() => PrikaziDetaljeProizvoda(proizvod)" class="image">
+                                    <img src="@proizvod.Base64Img" style="cursor:pointer;" width="270" height="270"/>
+                                </a>
+                                <ul>
+                                    <li><a @onclick="() => PrikaziDetaljeProizvoda(proizvod)"><i class="fa-solid fa-info"></i></a></li>
+                                    <li><a @onclick="() => DodajUKorpu(proizvod)"><i class="fas fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <div class="part-2">
+                                <h5>@proizvod.Kategorija.Naziv</h5>
+                                <h3 class="product-title" @onclick="() => PrikaziDetaljeProizvoda(proizvod)">@proizvod.Naziv</h3>
+                                <h4 class="product-price">@proizvod.Cena.ToString("#.##RSD")</h4>
+                            </div>
                         </div>
                     </div>
+                }
+                <div class="d-flex justify-content-center">
+                    <SfPager @ref="@stranica" PageSize="8" NumericItemsCount="4" TotalItemsCount="SviProizvodi.Count" ItemClick="Klik" />
                 </div>
-            }
-            <div class="d-flex justify-content-center">
-                <SfPager @ref="@stranica" PageSize="6" NumericItemsCount="4" TotalItemsCount="SviProizvodi.Count" ItemClick="Klik" />
-            </div>
 
+            </div>
         </div>
     </div>
+    
 }
 else
 {
@@ -41,7 +49,7 @@ else
 @code {
     SfPager? stranica;
     public int SkipVrednost;
-    public int TakeVrednost = 6;
+    public int TakeVrednost = 8;
 
     // ako se ne dobije nista kao parametar rute ili query string, kreira se nova lista proizvoda
     [Parameter]
@@ -62,18 +70,30 @@ else
 
     private async Task DodajUKorpu(Proizvod model)
     {
-        var (flag, poruka) = await korpaService.DodajUKorpu(model);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        if (flag)
-            messageDialogService.messageDialog!.SetDialogValues("success", poruka);
-
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            PrikaziOdgovor(await korpaService.DodajUKorpu(model));
+        }
         else
-            messageDialogService.messageDialog!.SetDialogValues("info", poruka);
-
-        messageDialogService.SetMessageDialog();
-
+        {
+            NavManager.NavigateTo("/nalog/prijava"); // Preusmeravanje na stranicu za prijavu
+        }
 
     }
+
+    private void PrikaziOdgovor(ServiceResponse serviceResponse)
+    {
+        if (serviceResponse.Flag)
+            messageDialogService.messageDialog!.SetDialogValues("success", serviceResponse.Poruka);
+        else
+            messageDialogService.messageDialog!.SetDialogValues("warning", serviceResponse.Poruka);
+
+        messageDialogService.SetMessageDialog();
+    }
+
 
     async Task PrikaziDetaljeProizvoda(Proizvod proizvod) => await HandleProductDetailsEvent.InvokeAsync(proizvod);
 
