@@ -72,7 +72,7 @@
     {
         messageDialogService.PrikaziDugmeSacuvaj = false;
         messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
-        var (flag, poruka) = await nalogService.RegistracijaAdmina(korisnik);
+        var (flag, poruka) = await nalogService.RegistracijaKorisnika(korisnik);
 
         if (flag)
         {

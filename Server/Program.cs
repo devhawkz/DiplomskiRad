@@ -8,6 +8,8 @@ using Server.Repository.NaplataRespositories;
 using Server.Repository.EmailRespository;
 using Microsoft.AspNetCore.Authentication;
 using Server.AuthHandler;
+using Stripe;
+
 
 
 namespace Server;
@@ -50,10 +52,10 @@ public class Program
         builder.Services.AddScoped<INaplata, NaplataRespository>();
         builder.Services.AddTransient<IEmail, EmailService>();
 
-        //builder.Services.AddAuthorizationCore();
 
 
-        var app = builder.Build();
+
+		var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

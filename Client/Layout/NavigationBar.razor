@@ -96,14 +96,13 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await korpaService.GetKorpaCount();
-        korpaService.KorpaAction += StateHasChanged;
-
-        var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
-        var authState = await customAuthenticationService.GetAuthenticationStateAsync();
-        var korisnik = authState.User;
-        isAdmin = korisnik.IsInRole("Admin");
-
+		var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
+		var authState = await customAuthenticationService.GetAuthenticationStateAsync();
+		var korisnik = authState.User;
+		isAdmin = korisnik.IsInRole("Admin");
+       
+		await korpaService.GetKorpaCount();
+		korpaService.KorpaAction += StateHasChanged;
     }
 
     
