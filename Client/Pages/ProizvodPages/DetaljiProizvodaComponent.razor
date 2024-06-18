@@ -1,4 +1,6 @@
 ﻿@implements IDisposable;
+@inject NavigationManager NavManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container-fluid">
     <div class="row">
@@ -59,12 +61,25 @@
         await HandleBackClickedEvent.InvokeAsync();
     }
 
-    async Task DodajUKorpu()
+
+     async Task DodajUKorpu()
     {
         if (Proizvod is null) return;
-        PrikaziOdgovor(await korpaService.DodajUKorpu(Proizvod!));
-    }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            PrikaziOdgovor(await korpaService.DodajUKorpu(Proizvod));
+        }
+        else
+        {
+            NavManager.NavigateTo("/nalog/prijava"); // Preusmeravanje na stranicu za prijavu
+        }
+
+
+    }
+   
     private void PrikaziOdgovor(ServiceResponse serviceResponse)
     {
         if (serviceResponse.Flag)
