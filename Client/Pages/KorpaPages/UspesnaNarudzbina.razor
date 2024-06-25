@@ -1,20 +1,28 @@
 ﻿@page "/uspesna-narudzbina"
 
 <div class="order-success-container">
+    <i class="checkmark">✓</i>
     <h1>Uspešna narudžbina!</h1>
     <p>Vaša narudžbina je uspešno obrađena.</p>
-    <a class="btn btn-primary" href="/">Nazad na početnu</a>
+    <a class="btn btn-primary" id="dugme" href="/">Nazad na početnu</a>
 </div>
 
 <style>
+    i {
+        color: #9ABC66;
+        font-size: 100px;
+        line-height: 200px;
+        margin-left: -15px;
+    }
+
     .order-success-container {
         text-align: center;
         padding: 20px;
-        border: 1px solid #ccc;
+        border: 1px dashed #ccc;
         border-radius: 5px;
         max-width: 500px;
         margin: 50px auto;
-        background-color: #f9f9f9;
+        background-color: #fff;
     }
 
         .order-success-container h1 {
@@ -23,6 +31,34 @@
 
         .order-success-container .btn {
             margin-top: 20px;
+        }
+
+        #dugme{
+        background-color: #24262b;
+        background: -moz-linear-gradient(75deg, #24262b 0%, #e91e63 100%);
+        background: -webkit-gradient(left top, right bottom, color-stop(0%, #24262b), color-stop(100%, #e91e63));
+        background: -webkit-linear-gradient(-75deg, #24262b 0%, #e91e63 100%);
+        background: -o-linear-gradient(-75deg, #24262b 0%, #e91e63 100%);
+        background: -ms-linear-gradient(-45deg, #24262b 0%, #e91e63 100%);
+        background: -webkit-linear-gradient(315deg, #24262b 0%, #e91e63 100%);
+        background: -o-linear-gradient(315deg, #24262b 0%, #e91e63 100%);
+        background: linear-gradient(135deg, ##24262b 0%, #e91e63 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#24262b', endColorstr='#e91e63', GradientType=1 );
+        color: #fff;
+        }
+
+        #dugme:hover{
+            background: #e91e63;
+            color: #fff;
+            background: -moz-linear-gradient(75deg, #e91e63 0%, #24262b 100%);
+            background: -webkit-gradient(left top, right bottom, color-stop(0%, #e91e63), color-stop(100%, #24262b));
+            background: -webkit-linear-gradient(-75deg, #e91e63 0%, #24262b 100%);
+            background: -o-linear-gradient(-75deg, #e91e63 0%, #24262b 100%);
+            background: -ms-linear-gradient(-45deg, #e91e63 0%, #24262b 100%);
+            background: -webkit-linear-gradient(315deg, #e91e63 0%, #24262b 100%);
+            background: -o-linear-gradient(315deg, #e91e63 0%, #24262b 100%);
+            background: linear-gradient(135deg, #e91e63 0%, #24262b 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e91e63', endColorstr='#24262b', GradientType=1 );
         }
 </style>
 

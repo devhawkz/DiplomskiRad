@@ -27,8 +27,8 @@ public class NaplataRespository : INaplata
                 Currency = "rsd",
                 ProductData = new SessionLineItemPriceDataProductDataOptions()
                 {
-                    Name = ci.Naziv,
-                    Description = ci.Id.ToString(),
+                    Name = ci.Naziv
+                    //Description = ci.Id.ToString(),
                 }
             },
 

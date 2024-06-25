@@ -5,26 +5,26 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12" id="kontejner">
-            <div class="card">
-                <div class="card-header" id="heder">Detalji proizvoda</div>
-                   
+            <div class="card" id="telo">
                     <div class="d-flex justify-content-between">
-                    <img src="@Proizvod!.Base64Img" width="150" height="250" />
-                        <div class="card-body" id="telo">
+                    <img src="@Proizvod!.Base64Img"  />
+                        <div class="card-body">
                             <p>
                                 <div class="vstack gap-2">
                                     <h3>@Proizvod.Naziv</h3>
                                     <div class="hstack gap-2">
-                                        <span>Kategorija: </span>
+                                    <span>Kategorija: </span>
                                         <span>
                                             @if(Proizvod is not null)
                                             {
-                                                <span>@Proizvod.Kategorija!.Naziv</span>
+                                            <span >@Proizvod.Kategorija!.Naziv</span>
                                             }
                                         </span>
                                     </div>
                                     <div class="hstack gap-2">
-                                        <h5>Tehničke specifikacije</h5>
+                                        <h5 style="text-align:center">Tehničke specifikacije</h5> 
+                                    </div>
+                                    <div class="hstack gap-2">
                                         <p>@Proizvod!.Opis</p>
                                     </div>
                                     <div class="hstack gap-2">
@@ -36,8 +36,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer" id="futer">
-                <button class="btn btn-info" id="dugme-crno" @onclick="KlikUnazad"><i class="fa fa-angle-left"></i>Nazad</button>
+                <div class="footer">
+                    <button class="btn btn-info" id="dugme-crno" @onclick="KlikUnazad">Nazad</button>
                     <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px;" @onclick="DodajUKorpu"><i class="fa fa-cart-shopping">Dodaj u korpu</i></button>
                 </div>
             </div>

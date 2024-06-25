@@ -106,7 +106,10 @@ else
         }
 
         if (!string.IsNullOrEmpty(Filter) || !string.IsNullOrWhiteSpace(Filter))
-            ListaProizvodaInterna = proizvodService.SviProizvodi.Where(_ => _.Naziv!.Contains(Filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        {
+            ListaProizvodaInterna = proizvodService.SviProizvodi.Where(_ => _.Naziv!.Contains(Filter, StringComparison.OrdinalIgnoreCase) ).ToList();
+            ListaProizvodaInterna = proizvodService.SviProizvodi.Where(_ => _.Opis!.Contains(Filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 
     public void Dispose()
