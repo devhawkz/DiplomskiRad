@@ -12,5 +12,16 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Uloga> Uloge { get; set; } = default!;
     public DbSet<TokenInfo> TokenInfo { get; set; } = default!;
 
-   
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Kategorija>()
+            .HasMany(k => k.Proizvodi)
+            .WithOne(p => p.Kategorija)
+            .HasForeignKey(p => p.KategorijaId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
+
 }
