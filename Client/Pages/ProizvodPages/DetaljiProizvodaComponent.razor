@@ -1,4 +1,5 @@
-﻿@implements IDisposable;
+﻿@using Client.Authentication
+@implements IDisposable;
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -38,7 +39,16 @@
                 </div>
                 <div class="footer">
                     <button class="btn btn-info" id="dugme-crno" @onclick="KlikUnazad">Nazad</button>
-                    <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px;" @onclick="DodajUKorpu"><i class="fa fa-cart-shopping">Dodaj u korpu</i></button>
+                    <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px;" @onclick="DodajUKorpu"><i class="fa fa-cart-shopping"></i></button>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if(isAdmin)
+                            {
+                            <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px; float:right;" @onclick="ObrisiProizvod">Obriši proizvod <i class="fa fa-solid fa-trash"></i></button>
+                            }
+                    </Authorized>
+                    </AuthorizeView>
+                
                 </div>
             </div>
         </div>
@@ -46,13 +56,21 @@
 
 <MessageDialog @ref="messageDialogService.messageDialog" />
 @code {
+    private bool isAdmin = false;
+
     [Parameter] public Proizvod Proizvod { get; set; }
 
     // obavestava parent komponentu cim se nesto desi u child komponenti
     [Parameter] public EventCallback HandleBackClickedEvent { get; set; }
 
+
     protected async override Task OnInitializedAsync()
     {
+        var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
+        var authState = await customAuthenticationService.GetAuthenticationStateAsync();
+        var korisnik = authState.User;
+        isAdmin = korisnik.IsInRole("Admin");
+
         messageDialogService.Action += StateHasChanged;
     }
 
@@ -62,7 +80,7 @@
     }
 
 
-     async Task DodajUKorpu()
+    async Task DodajUKorpu()
     {
         if (Proizvod is null) return;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -79,7 +97,29 @@
 
 
     }
-   
+
+    async Task ObrisiProizvod()
+    {
+        if(isAdmin)
+        {
+            if (Proizvod is null) return;
+            var (flag, poruka) = await proizvodService.ObrisiProizvod(Proizvod.Id);
+
+            if(flag)
+            {
+                messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+                NavManager.NavigateTo("/", forceLoad:true);
+            }
+
+            else
+                messageDialogService.messageDialog!.SetDialogValues("danger", poruka);
+        }
+        else
+            messageDialogService.messageDialog!.SetDialogValues("danger", "Nemate ovlašćenje za ovu operaciju!");
+
+
+    }
+
     private void PrikaziOdgovor(ServiceResponse serviceResponse)
     {
         if (serviceResponse.Flag)

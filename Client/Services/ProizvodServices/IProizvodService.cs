@@ -15,4 +15,5 @@ public interface IProizvodService
     List<Proizvod> ProizvodiIsteKategorije { get; set; }
     bool IsVisible { get; set; }
     Proizvod GetNasumicniProizvod();
+    Task<ServiceResponse> ObrisiProizvod(int id);
 }

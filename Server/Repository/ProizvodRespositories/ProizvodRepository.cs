@@ -43,4 +43,16 @@ public class ProizvodRepository(DataContext context, ITools tools) : IProizvod
                 .ToListAsync();
     }
 
+    public async Task<ServiceResponse> ObrisiProizvod(int id)
+    {
+        var proizvod = await context.Proizvodi.FindAsync(id);
+
+        if (proizvod is null)
+            return new ServiceResponse(false, "Proizvod sa tim id ne postoji u bazi");
+        
+        context.Proizvodi.Remove(proizvod);
+        await tools.Sacuvaj();
+        return new ServiceResponse(true, "Proizvod je uspešno obrisan");
+
+    }
 }

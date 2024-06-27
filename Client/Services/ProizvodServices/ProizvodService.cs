@@ -1,5 +1,6 @@
 ﻿using Client.Authentication;
 using Client.Services.ToolsService;
+using SharedLibrary.Models;
 
 
 namespace Client.Services.ProizvodServices;
@@ -62,7 +63,7 @@ public class ProizvodService(HttpClient http, IToolsService toolsService, Authen
     public async Task GetProizvode(bool preporuceniProizvod)
     {
 
-        if (!preporuceniProizvod && SviProizvodi is null)
+        if (!preporuceniProizvod)
         {
             IsVisible = true; // pokrece se screen loader
             SviProizvodi = await GetProizvodeSaApi(preporuceniProizvod);
@@ -127,4 +128,24 @@ public class ProizvodService(HttpClient http, IToolsService toolsService, Authen
         return PreporuceniProizvodi[randomId]!;
     }
 
+    public async Task<ServiceResponse> ObrisiProizvod(int id)
+    {
+        await authService.GetDetaljeKorisnika();
+        var privateHttp = await authService.AddZaglavljeToHttpClient();
+
+        var odgovor = await privateHttp.DeleteAsync($"{_proizvodBaseUrl}/{id}");
+        var rezultat = toolsService.ProveriStatusKod(odgovor);
+
+       
+        var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
+
+        var podaci = toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+
+        if (!podaci.Flag) return podaci;
+
+        
+        SviProizvodi.Clear();
+        await GetProizvode(false);
+        return podaci;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Client.Services.ProizvodServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Repository.KategorijaResposities;
 using SharedLibrary.Models;
@@ -17,13 +18,23 @@ namespace Server.Controllers
             return Ok(kategorije);
         }
 
-        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<ActionResult<ServiceResponse>> DodajKategoriju(Kategorija kategorijaModel)
         {
-            if (kategorijaModel is null) return BadRequest("Nije izabrana nijedna kategorija");
+            if (kategorijaModel is null) return BadRequest("Nije izabrana nijedna kategorija"!);
 
             var odgovor = await kategorijaService.DodajKategoriju(kategorijaModel);
+            return Ok(odgovor);
+        }
+
+        [HttpPost("obrisi-kategoriju")]
+        public async Task<ActionResult<ServiceResponse>> ObrisiKategoriju(string nazivKategorije)
+        {
+
+            if (string.IsNullOrEmpty(nazivKategorije) || string.IsNullOrWhiteSpace(nazivKategorije) || nazivKategorije.Equals(""))
+                return BadRequest("Nije izabrana nijedna kategorija!");
+
+            var odgovor = await kategorijaService.ObrisiKategoriju(nazivKategorije);
             return Ok(odgovor);
         }
     }

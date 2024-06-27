@@ -11,14 +11,16 @@ internal class ToolsRespository(DataContext context) : ITools
     {
         if(vrsta.Equals("proizvod"))
         {
-            var proizvod = await context.Proizvodi.FirstOrDefaultAsync(p => p.Naziv.ToLower()!.Equals(ime.ToLower()));
-            return proizvod is null ? new ServiceResponse(true, null) : new ServiceResponse(false, "Proizvod već postoji");
+            var proizvod = await context.Proizvodi.FirstOrDefaultAsync(p => p.Naziv!.ToLower()!.Equals(ime.ToLower()));
+            return proizvod is null ? new ServiceResponse(true, "Proizvod ne postoji") : new ServiceResponse(false, "Proizvod već postoji");
         }
    
-        var kategorija = await context.Kategorije.FirstOrDefaultAsync(p => p.Naziv.ToLower()!.Equals(ime.ToLower()));
-        return kategorija is null ? new ServiceResponse(true, null) : new ServiceResponse(false, "Kategorija već postoji");
+        var kategorija = await context.Kategorije.FirstOrDefaultAsync(k => k.Naziv!.ToLower()!.Equals(ime.ToLower()));
+        return kategorija is null ? new ServiceResponse(true, "Kategorija ne postoji") : new ServiceResponse(false, "Kategorija već postoji");
         
     }
+
+   
 
     public async Task<(string AccessToken, string RefreshToken)> GenerisiTokene()
     {

@@ -16,9 +16,9 @@ public class KategorijaRespository(DataContext context, ITools tools) : IKategor
         if (model is null) return new ServiceResponse(false, "Nije izabrana nijedna kategorija");
 
         // dekonstrukcija n-torke (tuple-a), ! je null - forgiving operator isto kao i dole
-        var (flag, poruka) = await tools.ProveriImeUBazi(vrsta ,model.Naziv!);
+        var (flag, poruka) = await tools.ProveriImeUBazi(vrsta, model.Naziv!);
 
-        if(flag) 
+        if (flag)
         {
             context.Kategorije.Add(model);
             await tools.Sacuvaj();
@@ -29,6 +29,23 @@ public class KategorijaRespository(DataContext context, ITools tools) : IKategor
         return new ServiceResponse(flag, poruka);
     }
 
-    public async Task<List<Kategorija>> GetKategorije() => await context.Kategorije.ToListAsync();        
-    
+    public async Task<List<Kategorija>> GetKategorije() => await context.Kategorije.ToListAsync();
+
+    public async Task<ServiceResponse> ObrisiKategoriju(string nazivKategorije)
+    {
+        var (flag, poruka) = await tools.ProveriImeUBazi(vrsta, nazivKategorije!);
+
+        if (!flag)
+        {
+            var kategorija = context.Kategorije.Where(_ => _.Naziv!.ToLower().Equals(nazivKategorije.ToLower()))
+                .FirstOrDefault();
+            context.Kategorije.Remove(kategorija!);
+            await tools.Sacuvaj();
+            return new ServiceResponse(true, "Kategorija je uspešno obrisana");
+        }
+
+        else
+            return new ServiceResponse(flag, poruka);
+    }
+
 }

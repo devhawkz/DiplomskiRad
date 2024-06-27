@@ -1,4 +1,5 @@
 ﻿using Client.Models;
+using Server.Repository.EmailRespository;
 using Stripe;
 using Stripe.Checkout;
 
@@ -8,7 +9,7 @@ public class NaplataRespository : INaplata
 {
     public NaplataRespository()
     {
-        StripeConfiguration.ApiKey = "sk_test_51PHiy21eDbOFZwMqbBzh6COfgK6pyRj2ZoEHYhjybeEfWTzT7TEASoQAaYmuiVxdZbRqTNiP6NKPltwYGYxCIytx00MPLBjQ2l";    
+        StripeConfiguration.ApiKey = "sk_test_51PHiy21eDbOFZwMqbBzh6COfgK6pyRj2ZoEHYhjybeEfWTzT7TEASoQAaYmuiVxdZbRqTNiP6NKPltwYGYxCIytx00MPLBjQ2l";
     }
 
     // povratna vrednost je tipa string kako bi mogli da vratimo service response
@@ -45,8 +46,7 @@ public class NaplataRespository : INaplata
             CancelUrl = "https://localhost:7151"
         };
 
-        // slanje mejla o uspesnoj narudzbini
-
+       
 
         // kreiranje sesije za placanje (checkout sesija)
         var servis = new SessionService();
