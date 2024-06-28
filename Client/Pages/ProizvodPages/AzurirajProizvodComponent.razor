@@ -1,5 +1,6 @@
 ﻿@page "/azuriraj-proizvod/{id:int}"
 @using Client.Authentication
+@inject NavigationManager NavManager;
 @implements IDisposable;
 
 <AuthorizeView>
@@ -162,8 +163,8 @@
             if (flag)
             {
                 messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+                NavManager.NavigateTo("/", forceLoad: true);
 
-              
             }
 
             else
