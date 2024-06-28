@@ -15,7 +15,7 @@ public class Proizvod
     [Required(ErrorMessage = "Polje Opis je obavezno.")]
     public string? Opis { get; set; } = string.Empty;
 
-    [Required, Column(TypeName = "decimal(18,2)"), Range(0.1, 99999.99, ErrorMessage = "Polje Cena je obavezno. Mora biti u opsegu od 0.1 do 99999.99")]
+    [Required, Column(TypeName = "decimal(18,2)"), Range(0.1, 999999.99, ErrorMessage = "Polje Cena je obavezno. Mora biti u opsegu od 0.1 do 99999.99")]
     public decimal Cena { get; set; }
 
     [Required(ErrorMessage = "Polje Slika je obavezno."), DisplayName("Slika proizvoda")]

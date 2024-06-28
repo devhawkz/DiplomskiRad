@@ -38,6 +38,10 @@ namespace Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KorisnickiNalogId");
+
+                    b.HasIndex("UlogaId");
+
                     b.ToTable("KorisnickeUloge");
                 });
 
@@ -166,6 +170,25 @@ namespace Server.Migrations
                     b.ToTable("Proizvodi");
                 });
 
+            modelBuilder.Entity("Server.Data.KorisnickaUloga", b =>
+                {
+                    b.HasOne("Server.Data.KorisnickiNalog", "KorisnickiNalog")
+                        .WithMany("KorisnickeUloge")
+                        .HasForeignKey("KorisnickiNalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Data.Uloga", "Uloga")
+                        .WithMany("KorisnickeUloge")
+                        .HasForeignKey("UlogaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KorisnickiNalog");
+
+                    b.Navigation("Uloga");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Proizvod", b =>
                 {
                     b.HasOne("SharedLibrary.Models.Kategorija", "Kategorija")
@@ -175,6 +198,16 @@ namespace Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Kategorija");
+                });
+
+            modelBuilder.Entity("Server.Data.KorisnickiNalog", b =>
+                {
+                    b.Navigation("KorisnickeUloge");
+                });
+
+            modelBuilder.Entity("Server.Data.Uloga", b =>
+                {
+                    b.Navigation("KorisnickeUloge");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Kategorija", b =>

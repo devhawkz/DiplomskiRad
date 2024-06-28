@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Server.Migrations
 {
     /// <inheritdoc />
-    public partial class prva : Migration
+    public partial class bazaProdavnice : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,20 +22,6 @@ namespace Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Kategorije", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "KorisnickeUloge",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    KorisnickiNalogId = table.Column<int>(type: "int", nullable: false),
-                    UlogaId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_KorisnickeUloge", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -109,6 +95,42 @@ namespace Server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "KorisnickeUloge",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    KorisnickiNalogId = table.Column<int>(type: "int", nullable: false),
+                    UlogaId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KorisnickeUloge", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_KorisnickeUloge_KorisnickiNalozi_KorisnickiNalogId",
+                        column: x => x.KorisnickiNalogId,
+                        principalTable: "KorisnickiNalozi",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KorisnickeUloge_Uloge_UlogaId",
+                        column: x => x.UlogaId,
+                        principalTable: "Uloge",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KorisnickeUloge_KorisnickiNalogId",
+                table: "KorisnickeUloge",
+                column: "KorisnickiNalogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KorisnickeUloge_UlogaId",
+                table: "KorisnickeUloge",
+                column: "UlogaId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Proizvodi_KategorijaId",
                 table: "Proizvodi",
@@ -122,13 +144,13 @@ namespace Server.Migrations
                 name: "KorisnickeUloge");
 
             migrationBuilder.DropTable(
-                name: "KorisnickiNalozi");
-
-            migrationBuilder.DropTable(
                 name: "Proizvodi");
 
             migrationBuilder.DropTable(
                 name: "TokenInfo");
+
+            migrationBuilder.DropTable(
+                name: "KorisnickiNalozi");
 
             migrationBuilder.DropTable(
                 name: "Uloge");
