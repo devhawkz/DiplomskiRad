@@ -1,0 +1,219 @@
+﻿@page "/azuriraj-proizvod/{id:int}"
+@using Client.Authentication
+@implements IDisposable;
+
+<AuthorizeView>
+    <Authorized>
+        @if (isAdmin)
+        {
+            <EditForm Model="proizvod" Enhance OnValidSubmit="AzurirajProizvod" Context="formContext">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <section class="ftco-section">
+                    <div class="container">
+                        <div class="row justify-content-center"></div>
+                        <div class="row justify-content-center">
+                            <div class="col-md-12 col-lg-10">
+                                <div class="wrap d-md-flex">
+                                    <div class="login-wrap p-4 p-lg-5">
+                                        <div class="d-flex">
+                                            <div class="w-100">
+                                                <h3 class="mb-4">Ažuriraj proizvod</h3>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label" for="name">Naziv proizvoda</label>
+                                            <input type="text" @bind="@proizvod!.Naziv" class="form-control" placeholder="Naziv proizvoda" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label" for="name">Kategorija</label>
+                                            <select @bind="@proizvod.KategorijaId" class="form-control">
+                                                @if (kategorijaService.SveKategorije != null)
+                                                {
+                                                    @foreach (var kategorija in kategorijaService.SveKategorije)
+                                                    {
+                                                        <option value="@kategorija.Id">@kategorija.Naziv</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label">Cena proizvoda</label>
+                                            <input type="text" @bind="@proizvod.Cena" class="form-control" placeholder="Cena" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label">Količina</label>
+                                            <input type="number" @bind="@proizvod.Kolicina" class="form-control" placeholder="Količina" />
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label class="label" data-toggle="tooltip" title="Označite ako želite da proizvod preporučite kupcima">Preporuka:</label>
+                                            <input type="checkbox" class="custom-checkbox" @bind="@proizvod.PreporucenProizvod" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label">Opis proizvoda</label>
+                                            <textarea @bind="@proizvod.Opis" class="form-control" placeholder="Opis proizvoda"></textarea>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="label @(uploadSlikePoruka == "" ? "" : "text-danger")">
+                                                @(uploadSlikePoruka == "" ? "Dodaj sliku" : uploadSlikePoruka)
+                                            </label>
+                                            <InputFile class="form-control" placeholder="Opis proizvoda" OnChange="UploadSliku"></InputFile>
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="submit" class="form-control btn btn-primary submit px-3">Sačuvaj proizvod</button>
+                                        </div>
+                                    </div>
+                                    <div class="text-wrap p-4 p-lg-5 text-center d-flex align-items-center order-md-last">
+                                        <div class="text w-100">
+                                            <h2>Želite da dodate  novi proizvod?</h2>
+                                            <a href="/dodaj-proizvod" class="btn btn-white btn-outline-white">Dodaj proizvod</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </EditForm>
+
+
+            <!--Ukljucuje MessageDialog komponentu u render ove komponente i dodeljuje promenljivoj messageDialog referencu ka komponenti MessageDialog-->
+            <MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
+        }
+        else
+        {
+            <div id="notfound">
+                <div class="notfound">
+                    <div class="notfound-404">
+                        <h1>404</h1>
+                    </div>
+                    <h2>Zabranjen pristup resursu</h2>
+                    <p>Nemate ovlašćenje za ovu operaciju</p>
+                    <a href="/">Nazad na početnu</a>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div id="notfound">
+            <div class="notfound">
+                <div class="notfound-404">
+                    <h1>404</h1>
+                </div>
+                <h2>Niste prijavljeni</h2>
+                <p>Morate biti prijavljeni da bi mogli da pristupite ovoj stranici.</p>
+                <a href="/nalog/prijava">Prijava</a>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Proizvod proizvod = new Proizvod();
+
+    string uploadSlikePoruka = string.Empty;
+    bool isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await proizvodService.GetProizvode(false);
+        await kategorijaService.GetKategorije();
+        proizvod = await proizvodService.GetProizvodPoId(Id);
+        var customAuthenticationService = (CustomAuthenticationStateProvider)AuthStateProvider;
+        var authState = await customAuthenticationService.GetAuthenticationStateAsync();
+        var korisnik = authState.User;
+        isAdmin = korisnik.IsInRole("Admin");
+
+        // ako se desi promena u listi kategorija pretplatom na ovaj delegat izvrsicemo promenu ovoj komponenti, odnosno ponovo ce se ucitati stranica
+        kategorijaService.KategorijaAction += StateHasChanged;
+        // vidi u DodajKategorijuComponent
+        messageDialogService.Action += StateHasChanged;
+    }
+
+    async Task AzurirajProizvod()
+    {
+        messageDialogService.PrikaziDugmeSacuvaj = false;
+        messageDialogService.PrikaziBusyDugme = !messageDialogService.PrikaziDugmeSacuvaj;
+
+        proizvod.Id = Id;
+
+        //ako nije izabrana slika
+        if (string.IsNullOrEmpty(proizvod.Base64Img))
+        {
+            //Ova metoda  postavlja vrednosti za dijalog poruke.postavlja se tip poruke na "warning" (upozorenje) i tekst poruke na "Morate da dodate sliku!".
+            messageDialogService.messageDialog!.SetDialogValues("warning", "Morate da dodate sliku!");
+
+            // prikazuje se poruka i menja se stanje komponente
+            messageDialogService.SetMessageDialog();
+            return;
+        }
+
+
+
+        if (isAdmin)
+        {
+            var (flag, poruka) = await proizvodService.AzurirajProizvod(proizvod);
+
+            if (flag)
+            {
+                messageDialogService.messageDialog!.SetDialogValues("success", poruka);
+
+              
+            }
+
+            else
+                messageDialogService.messageDialog!.SetDialogValues("danger", poruka);
+        }
+
+        else
+            messageDialogService.messageDialog!.SetDialogValues("danger", "Nemate ovlašćenje za ovu operaciju!");
+
+        messageDialogService.SetMessageDialog();
+    }
+
+    async Task UploadSliku(InputFileChangeEventArgs e)
+    {
+        //proverava da li se u nazivu fajla nalazi .jpg ekstenzija (string)
+        if (e.File.Name.ToLower().Contains(".jpg"))
+        {
+            // postavlja format slike na jpg
+            var format = "image/jpg";
+
+            //Asinhrono se traži slika iz datoteke učitane u e argumentu. Traži se slika u jpg formatu, a dimenzije su ograničene na 500x500 piksela.
+            var resizeSliku = await e.File.RequestImageFileAsync(format, 500, 500);
+
+            //Stvara se bafer (buffer) veličine potrebne za sliku koja se učitala. Veličina bafera odgovara veličini slike koja je prethodno zatražena.
+            var buffer = new byte[resizeSliku.Size];
+
+            //Asinhrono se čita sadržaj slike i sprema se u bafer. OpenReadStream() otvara tok podataka slike, a ReadAsync(buffer) čita sadržaj slike asinhrono i sprema ga u bafer.
+            await resizeSliku.OpenReadStream().ReadAsync(buffer);
+
+            //Kreira se string podaciSlike koji sadrži podatke slike u Base64 formatu. Ovo je uobičajeni način za kodiranje slika u tekstualni format koji se može lako prenositi preko mreže ili pohraniti u bazu podataka.
+            var podaciSlike = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+
+            //Ako je sve prošlo kako treba, poruka o uploadu slike se postavlja na prazan string, vjerojatno da bi se očistila prethodna poruka ili obavijest.
+            uploadSlikePoruka = "";
+
+            //Postavlja se Base64 reprezentacija slike u Base64Img svojstvo objekta proizvod
+            proizvod.Base64Img = podaciSlike;
+
+            // brise se podaciSlike promenljiva radi ciscenja memorije
+            podaciSlike = "";
+            return;
+        }
+
+        uploadSlikePoruka = "Samo slika u jpg formatu.";
+        return;
+    }
+
+    public void Dispose()
+    {
+        messageDialogService.Action -= StateHasChanged;
+        kategorijaService.KategorijaAction -= StateHasChanged;
+    }
+}

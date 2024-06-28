@@ -16,4 +16,6 @@ public interface IProizvodService
     bool IsVisible { get; set; }
     Proizvod GetNasumicniProizvod();
     Task<ServiceResponse> ObrisiProizvod(int id);
+    Task<ServiceResponse> AzurirajProizvod(Proizvod proizvod);
+    Task<Proizvod> GetProizvodPoId(int id);
 }

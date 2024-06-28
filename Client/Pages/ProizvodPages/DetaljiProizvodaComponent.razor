@@ -45,6 +45,7 @@
                             @if(isAdmin)
                             {
                             <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px; float:right;" @onclick="ObrisiProizvod">Obriši proizvod <i class="fa fa-solid fa-trash"></i></button>
+                            <button class="btn btn-danger" id="dugme-crveno" style="margin-left:20px; float:right;" @onclick="AzurirajProizvod">Izmeni proizvod <i class="fa fa-solid fa-recycle"></i></button>
                             }
                     </Authorized>
                     </AuthorizeView>
@@ -117,7 +118,19 @@
         else
             messageDialogService.messageDialog!.SetDialogValues("danger", "Nemate ovlašćenje za ovu operaciju!");
 
+        messageDialogService.SetMessageDialog();
 
+
+    }
+
+    async Task AzurirajProizvod()
+    {
+        if(isAdmin)
+        {
+            if (Proizvod is null) return;
+
+            NavManager.NavigateTo($"/azuriraj-proizvod/{Proizvod.Id}", forceLoad: true);
+        }
     }
 
     private void PrikaziOdgovor(ServiceResponse serviceResponse)

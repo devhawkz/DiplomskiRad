@@ -148,4 +148,38 @@ public class ProizvodService(HttpClient http, IToolsService toolsService, Authen
         await GetProizvode(false);
         return podaci;
     }
+
+    public async Task<ServiceResponse> AzurirajProizvod(Proizvod proizvod)
+    {
+        await authService.GetDetaljeKorisnika();
+        var privateHttp = await authService.AddZaglavljeToHttpClient();
+
+        var odgovor = await privateHttp.PutAsync(_proizvodBaseUrl, toolsService.GenerateStringContent(toolsService.SerializeObj(proizvod)));
+        var rezultat = toolsService.ProveriStatusKod(odgovor);
+
+
+        var apiOdgovor = await toolsService.CitajSadrzaj(odgovor);
+
+        var podaci = toolsService.DeserializeJsonString<ServiceResponse>(apiOdgovor);
+
+        if (!podaci.Flag) return podaci;
+
+
+        SviProizvodi.Clear();
+        await GetProizvode(false);
+        return podaci;
+    }
+
+    public async Task<Proizvod> GetProizvodPoId(int id)
+    {
+        if (id <= 0)
+            return null!;
+
+        var proizvod = SviProizvodi.Find(p => p.Id == id);
+
+        if (proizvod is null)
+            return null!; 
+
+        return proizvod!;
+    }
 }

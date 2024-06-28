@@ -36,4 +36,15 @@ public class ProizvodController(IProizvod proizvodService) : ControllerBase
         var odgovor = await proizvodService.ObrisiProizvod(id);
         return Ok(odgovor);
     }
+
+
+    [HttpPut]
+    public async Task<ActionResult<ServiceResponse>> AzurirajProizvod(Proizvod proizvodModel)
+    {
+        if (proizvodModel is null)
+            return BadRequest("Nije izabran nijedan proizvod");
+
+        var odgovor = await proizvodService.AzurirajProizvod(proizvodModel);
+        return Ok(odgovor);
+    }
 }
