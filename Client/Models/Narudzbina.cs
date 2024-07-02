@@ -10,3 +10,4 @@ public class Narudzbina
 
     public decimal UkupnaCena => Kolicina * Cena;
 }
+// 1 narudzbina => 1 proizvod iz korpe

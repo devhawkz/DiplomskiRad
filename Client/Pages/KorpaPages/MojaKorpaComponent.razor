@@ -44,7 +44,7 @@
                                                             </td>
 
                                                             <td>
-                                                                @proizvod.Cena.ToString("#.## RSD")
+                                                                @proizvod.Cena.ToString("#.##0,00 RSD")
                                                             </td>
                                                             <td>
                                                                 <span class="close">
@@ -73,11 +73,11 @@
                             <hr>
                             <div class="row">
                                 <div class="col" style="padding-left:0;">@MojaKorpaNarudzbine.Count PROIZVODA</div>
-                                <div class="col text-right">@MojaKorpaNarudzbine.Sum(_ => _.UkupnaCena).ToString("#.## RSD")</div>
+                                <div class="col text-right">@MojaKorpaNarudzbine.Sum(_ => _.UkupnaCena).ToString("#,##0.00 RSD")</div>
                             </div>
                             <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
                                 <div class="col">Ukupno za plaćanje</div>
-                                <div class="col text-right">@MojaKorpaNarudzbine.Sum(_ => (_.UkupnaCena * 1.2m)).ToString("#.## RSD")</div>
+                                <div class="col text-right">@MojaKorpaNarudzbine.Sum(_ => (_.UkupnaCena * 1.2m)).ToString("#,##0.00 RSD")</div>
                             </div>
                             <button class="btn" @onclick="Naplata">Nastavi sa plaćanjem</button>
                         </div>

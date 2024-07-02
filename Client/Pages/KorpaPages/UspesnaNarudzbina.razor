@@ -33,7 +33,7 @@
             margin-top: 20px;
         }
 
-        #dugme{
+    #dugme {
         background-color: #24262b;
         background: -moz-linear-gradient(75deg, #24262b 0%, #e91e63 100%);
         background: -webkit-gradient(left top, right bottom, color-stop(0%, #24262b), color-stop(100%, #e91e63));
@@ -45,9 +45,9 @@
         background: linear-gradient(135deg, ##24262b 0%, #e91e63 100%);
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#24262b', endColorstr='#e91e63', GradientType=1 );
         color: #fff;
-        }
+    }
 
-        #dugme:hover{
+        #dugme:hover {
             background: #e91e63;
             color: #fff;
             background: -moz-linear-gradient(75deg, #e91e63 0%, #24262b 100%);
@@ -60,12 +60,9 @@
             background: linear-gradient(135deg, #e91e63 0%, #24262b 100%);
             filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e91e63', endColorstr='#24262b', GradientType=1 );
         }
+
 </style>
-
 @code {
-
-   
-
     protected async override Task OnInitializedAsync()
     {
         var lista = await korpaService.MojeNarudzbine();
