@@ -16,12 +16,22 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Kategorija>()
-            .HasMany(k => k.Proizvodi)
-            .WithOne(p => p.Kategorija)
-            .HasForeignKey(p => p.KategorijaId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Proizvod>()
+                .HasOne(p => p.Kategorija)
+                .WithMany(k => k.Proizvodi)
+                .HasForeignKey(p => p.KategorijaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<KorisnickaUloga>()
+                .HasOne(ku => ku.KorisnickiNalog)
+                .WithMany(kn => kn.KorisnickeUloge)
+                .HasForeignKey(ku => ku.KorisnickiNalogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<KorisnickaUloga>()
+               .HasOne(ku => ku.Uloga)
+               .WithMany(u => u.KorisnickeUloge)
+               .HasForeignKey(ku => ku.UlogaId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
-
-
 }
