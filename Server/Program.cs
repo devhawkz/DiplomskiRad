@@ -5,7 +5,6 @@ using Server.Repository.KorisnikRespositories;
 using Server.Repository.ProizvodRespositories;
 using Server.Repository.Tools;
 using Server.Repository.NaplataRespositories;
-using Server.Repository.EmailRespository;
 using Microsoft.AspNetCore.Authentication;
 using Server.AuthHandler;
 using Stripe;
@@ -50,7 +49,6 @@ public class Program
         builder.Services.AddScoped<IKategorija, KategorijaRespository>();
         builder.Services.AddScoped<IKorisnickiNalog, KorisnickiNalogRespository>();
         builder.Services.AddScoped<INaplata, NaplataRespository>();
-        builder.Services.AddTransient<IEmail, EmailService>();
 
 
 

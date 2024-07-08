@@ -1,5 +1,4 @@
 ﻿using Client.Models;
-using Server.Repository.EmailRespository;
 using Stripe;
 using Stripe.Checkout;
 
