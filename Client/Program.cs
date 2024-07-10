@@ -31,7 +31,7 @@ public class Program
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
         builder.Services.AddScoped<IProizvodService, ProizvodService>();
-        builder.Services.AddSingleton<IToolsService, Tools>();
+        builder.Services.AddScoped<IToolsService, Tools>();
         builder.Services.AddScoped<IKategorijaService, KategorijaService>();
         builder.Services.AddScoped<IKorisnikService, KorisnikService>();
         builder.Services.AddScoped<IKorpa, KorpaService>();
@@ -42,7 +42,6 @@ public class Program
         builder.Services.AddScoped<INaplata, NaplataService>();
 
         builder.Services.AddAuthorizationCore();
-
         builder.Services.AddSyncfusionBlazor();
         builder.Services.AddBlazoredLocalStorage();
 

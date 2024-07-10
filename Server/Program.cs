@@ -38,11 +38,6 @@ public class Program
         builder.Services.AddAuthentication("CustomScheme")
             .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>("CustomScheme", null);
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-            options.AddPolicy("UserOnly", policy => policy.RequireRole("Korisnik"));
-        });
 
         builder.Services.AddScoped<IProizvod, ProizvodRepository>();
         builder.Services.AddScoped<ITools, ToolsRespository>();
@@ -65,17 +60,12 @@ public class Program
 
       
         app.UseHttpsRedirection();
-
-        app.UseBlazorFrameworkFiles();
         app.UseStaticFiles();
-
+        app.UseBlazorFrameworkFiles();
         app.UseAuthentication();
-        app.UseAuthorization();
         
         app.MapRazorPages();
-        
         app.MapControllers();
-
         app.MapFallbackToFile("index.html");
 
         app.Run();

@@ -31,16 +31,20 @@ public class ProizvodRepository(DataContext context, ITools tools) : IProizvod
 
     public async Task<List<Proizvod>> GetProizvode(bool preporuceniProizvod)
     {
+        //sa IQueryable upiti se formiraju i optimizuju pre nego sto se izvrse nad bazom, izvrsavaju se tek onda kada se podaci zatraze 
+        IQueryable<Proizvod> upit = context.Proizvodi
+            .Include(p => p.Kategorija)
+            .AsNoTracking();
+
         // _ je placeholder, nema potrebe za eksplicitnim imenovanjem promenljive ili parametra
         if (preporuceniProizvod)
-            return await context.Proizvodi
-                .Where(p => p.PreporucenProizvod)
-                .Include(_ => _.Kategorija)
-                .ToListAsync();
+        {
+            upit = upit.Where(p => p.PreporucenProizvod);
+            return upit.ToList();
+        }
+
         else
-            return await context.Proizvodi
-                .Include(_ => _.Kategorija)
-                .ToListAsync();
+            return upit.ToList();
     }
 
     public async Task<ServiceResponse> ObrisiProizvod(int id)

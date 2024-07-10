@@ -26,15 +26,5 @@ public class KategorijaController(IKategorija kategorijaService) : ControllerBas
         var odgovor = await kategorijaService.DodajKategoriju(kategorijaModel);
         return Ok(odgovor);
     }
-
-    [HttpPost("obrisi-kategoriju")]
-    public async Task<ActionResult<ServiceResponse>> ObrisiKategoriju(string nazivKategorije)
-    {
-
-        if (string.IsNullOrEmpty(nazivKategorije) || string.IsNullOrWhiteSpace(nazivKategorije) || nazivKategorije.Equals(""))
-            return BadRequest("Nije izabrana nijedna kategorija!");
-
-        var odgovor = await kategorijaService.ObrisiKategoriju(nazivKategorije);
-        return Ok(odgovor);
-    }
+   
 }

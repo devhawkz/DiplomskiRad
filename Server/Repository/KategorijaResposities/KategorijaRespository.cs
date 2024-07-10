@@ -30,22 +30,4 @@ public class KategorijaRespository(DataContext context, ITools tools) : IKategor
     }
 
     public async Task<List<Kategorija>> GetKategorije() => await context.Kategorije.ToListAsync();
-
-    public async Task<ServiceResponse> ObrisiKategoriju(string nazivKategorije)
-    {
-        var (flag, poruka) = await tools.ProveriImeUBazi(vrsta, nazivKategorije!);
-
-        if (!flag)
-        {
-            var kategorija = context.Kategorije.Where(_ => _.Naziv!.ToLower().Equals(nazivKategorije.ToLower()))
-                .FirstOrDefault();
-            context.Kategorije.Remove(kategorija!);
-            await tools.Sacuvaj();
-            return new ServiceResponse(true, "Kategorija je uspešno obrisana");
-        }
-
-        else
-            return new ServiceResponse(flag, poruka);
-    }
-
 }

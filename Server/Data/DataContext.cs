@@ -17,10 +17,14 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Proizvod>()
-                .HasOne(p => p.Kategorija)
-                .WithMany(k => k.Proizvodi)
-                .HasForeignKey(p => p.KategorijaId)
-                .OnDelete(DeleteBehavior.Cascade);
+               .HasIndex(p => p.KategorijaId)
+               .HasDatabaseName("IX_KategorijaId");
+
+        modelBuilder.Entity<Proizvod>()
+               .HasOne(p => p.Kategorija)
+               .WithMany(k => k.Proizvodi)
+               .HasForeignKey(p => p.KategorijaId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<KorisnickaUloga>()
                 .HasOne(ku => ku.KorisnickiNalog)
