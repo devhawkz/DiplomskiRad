@@ -59,5 +59,11 @@ ECommerceWeldingStore/
 
 ## 📞 Contact
 For any questions or support, feel free to reach out:
-- 📧 Email: pavlejovanovic34@gmail.com
 - 🔗 GitHub: [github.com/devhawkz](https://github.com/devhawkz)
+- 📫 How to reach me **pavlejovanovic34@gmail.com** 
+- 📫 How to reach me **skydevhawkz@gmail.com**
+
+<h3 align="left">Connect with me:</h3>
+<p align="left">
+<a href="https://linkedin.com/in/pavlejovanovic34" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="pavlejovanovic34" height="30" width="40" /></a>
+</p>
