@@ -25,7 +25,7 @@ It includes an authentication and authorization system, shopping cart functional
 ECommerceWeldingStore/
 │── Server/          # Backend API (ASP.NET Core)
 │── Client/       # Frontend (Blazor WASM)
-│── SharedLibrary/         # Entity Framework Models & Migrations
+│── SharedLibrary/         # Entity Framework Models
 │── Server.Repository/         # Business Logic & Services
 │── README.md               # Project Documentation
 ```
